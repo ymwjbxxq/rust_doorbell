@@ -1,0 +1,25 @@
+AWSTemplateFormatVersion: 2010-09-09
+Transform: AWS::Serverless-2016-10-31
+Description: S3 Bucket to store the photos
+
+Parameters:
+  lifecycleDeleteDays:
+    Type: String
+    Default: 1
+      
+Resources:
+  PhotoBucket:
+    Type: AWS::S3::Bucket
+    Properties:
+      LifecycleConfiguration:
+        Rules:
+          - Id: DeleteLifeCyclePolicy
+            Status: Enabled
+            ExpirationInDays: !Sub ${lifecycleDeleteDays}
+
+Outputs:
+  PhotoBucket:
+    Value: 
+      Ref: PhotoBucket
+    Export: 
+      Name: !Sub ${AWS::StackName}-S3
