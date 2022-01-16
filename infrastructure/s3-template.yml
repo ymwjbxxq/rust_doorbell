@@ -3,14 +3,38 @@ Transform: AWS::Serverless-2016-10-31
 Description: S3 Bucket to store the photos
 
 Resources:
+##########################################################################
+#   S3                                                                  #
+##########################################################################
   SourceBucket:
     Type: AWS::S3::Bucket
     Properties:
+      NotificationConfiguration:
+        EventBridgeConfiguration:
+          EventBridgeEnabled: True
       LifecycleConfiguration:
         Rules:
           - Id: DeleteLifeCyclePolicy
             Status: Enabled
             ExpirationInDays: 1
+##########################################################################
+#   BUCKET POLICY                                                        #
+##########################################################################
+  SourceBucketPolicy:
+    Type: AWS::S3::BucketPolicy
+    Properties:
+      Bucket: !Ref SourceBucket
+      PolicyDocument:
+        Statement:
+        - Action: s3:*
+          Effect: Deny
+          Principal: "*"
+          Resource:
+          - !Sub "arn:aws:s3:::${SourceBucket}/*"
+          - !Sub "arn:aws:s3:::${SourceBucket}"
+          Condition:
+            Bool:
+              aws:SecureTransport: false
 
 Outputs:
   SourceBucketName:
@@ -18,6 +42,9 @@ Outputs:
     Export:
       Name: SourceBucket
   SourceBucketArn:
-      Value: !GetAtt: SourceBucket.Arn
+      Value:
+        Fn::GetAtt:
+          - SourceBucket
+          - Arn
       Export:
         Name: SourceBucketArn
