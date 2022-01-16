@@ -1,0 +1,45 @@
+AWSTemplateFormatVersion: 2010-09-09
+Transform: AWS::Serverless-2016-10-31
+Description: StepFunctions state machine
+
+Resources:
+##########################################################################
+#   STEP FUNCTION                                                        #
+##########################################################################
+  MyStateMachine:
+    Type: AWS::Serverless::StateMachine
+    Properties:
+      DefinitionUri: statemachine/stateMachine.asl.json
+      Policies:
+        - Version: "2012-10-17"
+          Statement:
+            - Effect: Allow
+              Action:
+                - "cloudwatch:*"
+                - "logs:*"
+                - "rekognition:CompareFaces"
+              Resource: "*"
+            - Effect: Allow
+              Action:
+                - "s3:GetObject"
+              Resource:
+                - !ImportValue SourceBucketArn
+      Logging:
+        Destinations:
+          - CloudWatchLogsLogGroup:
+              LogGroupArn: !GetAtt MyStateMachineLogGroup.Arn
+        IncludeExecutionData: false
+        Level: 'ALL'
+
+##########################################################################
+#  STEP FUNCTION LOG GROUP                                               #
+##########################################################################
+  MyStateMachineLogGroup:
+    Type: AWS::Logs::LogGroup
+    Properties:
+      LogGroupName: !Join [ "/", [ "stepfunctions", MyStateMachine]]
+
+Outputs:
+  MyStateMachine:
+    Value: !Ref MyStateMachine
+    Description: MyStateMachine Arn

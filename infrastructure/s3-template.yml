@@ -3,7 +3,7 @@ Transform: AWS::Serverless-2016-10-31
 Description: S3 Bucket to store the photos
 
 Resources:
-  PhotoBucket:
+  SourceBucket:
     Type: AWS::S3::Bucket
     Properties:
       LifecycleConfiguration:
@@ -13,5 +13,11 @@ Resources:
             ExpirationInDays: 1
 
 Outputs:
-  PhotoBucketName:
-    Value: !Ref PhotoBucket
+  SourceBucketName:
+    Value: !Ref SourceBucket
+    Export:
+      Name: SourceBucket
+  SourceBucketArn:
+      Value: !GetAtt: SourceBucket.Arn
+      Export:
+        Name: SourceBucketArn
