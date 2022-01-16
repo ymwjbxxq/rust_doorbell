@@ -34,7 +34,7 @@ Resources:
 #   Lambda Function                                                      #
 ##########################################################################
   OnConnectLambdaFunction:
-    Type: 'AWS::Serverless::Function'
+    Type: AWS::Serverless::Function
     Properties:
       CodeUri: ../build/on-connect/
       Policies:
@@ -52,15 +52,15 @@ Resources:
       BuildMethod: makefile
 
   OnConnectFunctionResourcePermission:
-    Type: 'AWS::Lambda::Permission'
+    Type: AWS::Lambda::Permission
     Properties:
-      Action: 'lambda:InvokeFunction'
+      Action: lambda:InvokeFunction
       Principal: apigateway.amazonaws.com
       FunctionName: !Ref OnConnectLambdaFunction
-      SourceArn: !Sub 'arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${WebSocketApi}/*'
+      SourceArn: !Sub arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${WebSocketApi}/*
 
   OnDisconnectLambdaFunction:
-    Type: 'AWS::Serverless::Function'
+    Type: AWS::Serverless::Function
     Properties:
       CodeUri: ../build/on-disconnect/
       Policies:
@@ -78,18 +78,18 @@ Resources:
       BuildMethod: makefile
 
   OnDisconnectFunctionResourcePermission:
-    Type: 'AWS::Lambda::Permission'
+    Type: AWS::Lambda::Permission
     Properties:
-      Action: 'lambda:InvokeFunction'
+      Action: lambda:InvokeFunction
       Principal: apigateway.amazonaws.com
       FunctionName: !Ref OnDisconnectLambdaFunction
-      SourceArn: !Sub 'arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${WebSocketApi}/*'
+      SourceArn: !Sub arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${WebSocketApi}/*
 
 ##########################################################################
 #   API Gateway WebSocket API                                            #
 ##########################################################################
   WebSocketApi:
-    Type: 'AWS::ApiGatewayV2::Api'
+    Type: AWS::ApiGatewayV2::Api
     Properties:
       Name: !Ref AWS::StackName
       Description: An Amazon API Gateway WebSocket API and an AWS Lambda function.
@@ -114,8 +114,8 @@ Resources:
       AuthorizationType: NONE
       OperationName: OnConnectRoute
       Target: !Join
-        - '/'
-        - - 'integrations'
+        - /
+        - - integrations
           - !Ref OnConnectIntegration
 
   OnDisconnectIntegration:
@@ -136,8 +136,8 @@ Resources:
       AuthorizationType: NONE
       OperationName: OnDisconnectRoute
       Target: !Join
-        - '/'
-        - - 'integrations'
+        - /
+        - - integrations
           - !Ref OnDisconnectIntegration
 
   Deployment:
@@ -165,4 +165,4 @@ Outputs:
     Value: !GetAtt OnDisconnectLambdaFunction.Arn
   WebSocketURL:
     Description: "The WSS Protocol URL to connect to"
-    Value: !Join [ '', [ 'wss://', !Ref WebSocketApi, '.execute-api.',!Ref 'AWS::Region','.amazonaws.com/',!Ref 'Stage'] ]
+    Value: !Join [ '', [ wss://, !Ref WebSocketApi, .execute-api.,!Ref AWS::Region,.amazonaws.com/,!Ref Stage] ]
