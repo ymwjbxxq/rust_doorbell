@@ -1,0 +1,62 @@
+{
+  "Comment": "Compare face flow",
+  "StartAt": "CompareFaces",
+  "States": {
+    "CompareFaces": {
+      "Type": "Task",
+      "Parameters": {
+        "SimilarityThreshold": 70,
+        "SourceImage": {
+          "S3Object": {
+            "Bucket.$": "$.buckeName",
+            "Name": "source.jpeg"
+          }
+        },
+        "TargetImage": {
+          "S3Object": {
+            "Bucket.$": "$.buckeName",
+            "Name.$": "$.input"
+          }
+        }
+      },
+      "Resource": "arn:aws:states:::aws-sdk:rekognition:compareFaces",
+      "Next": "If Face Match?",
+      "Catch": [
+        {
+          "ErrorEquals": [
+            "Rekognition.InvalidParameterException"
+          ],
+          "Next": "Not Human"
+        }
+      ]
+    },
+    "Not Human": {
+      "Type": "Fail"
+    },
+    "If Face Match?": {
+      "Type": "Choice",
+      "Choices": [
+        {
+          "And": [
+            {
+              "Variable": "$.FaceMatches[0]",
+              "IsPresent": true
+            },
+            {
+              "Variable": "$.FaceMatches[0].Face.Confidence",
+              "NumericGreaterThan": 70
+            }
+          ],
+          "Next": "Success"
+        }
+      ],
+      "Default": "Fail"
+    },
+    "Success": {
+      "Type": "Succeed"
+    },
+    "Fail": {
+      "Type": "Fail"
+    }
+  }
+}
