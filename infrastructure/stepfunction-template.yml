@@ -30,6 +30,20 @@ Resources:
               LogGroupArn: !GetAtt MyStateMachineLogGroup.Arn
         IncludeExecutionData: false
         Level: 'ALL'
+      Events:
+        StateChange:
+          Type: EventBridgeRule
+          Properties:
+            InputPath: $.detail
+            Pattern:
+              source:
+                - aws.s3
+              detail:
+                bucket:
+                  name: 
+                    - !ImportValue SourceBucket
+                reason:
+                  - PutObject
 
 ##########################################################################
 #  STEP FUNCTION LOG GROUP                                               #
