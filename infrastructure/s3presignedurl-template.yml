@@ -1,0 +1,67 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: EventBridge to Lambda
+
+# Global values that are applied to all applicable resources in this template
+Globals:
+  Function:
+    MemorySize: 1024
+    Architectures: ["arm64"]
+    Handler: bootstrap
+    Runtime: provided.al2
+    Timeout: 29
+    Environment:
+      Variables:
+        RUST_BACKTRACE: 1
+        RUST_LOG: info
+
+Resources:
+##########################################################################
+#   EventBridge                                                          #
+##########################################################################
+  S3PresignedUrlBus:
+    Type: AWS::Events::EventBus
+    Properties:
+      Name: !Ref AWS::StackName
+
+##########################################################################
+#   Lambda Function                                                      #
+##########################################################################
+  S3PresignedUrlLambdaFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: ../build/s3-presigned-url/
+      Policies:
+        - AWSLambdaBasicExecutionRole
+        - Version: "2012-10-17"
+          Statement:
+            - Effect: Allow
+              Action:
+                - "s3:PutObject"
+              Resource:
+                - !ImportValue SourceBucketArn
+      Environment:
+        Variables:
+          TABLE_NAME: !ImportValue SourceBucket
+      Events:
+        Trigger:
+          Type: EventBridgeRule 
+          Properties:
+            Pattern:
+              detail:
+                source:
+                  - doorbell.onconnect
+                eventName:
+                  - Connected
+
+Outputs:
+  S3PresignedUrlBusName:
+    Description: EventBridge s3 pre signed url bus name
+    Value: !Ref S3PresignedUrlBus
+    Export:
+      Name: S3PresignedUrlBusName
+  S3PresignedUrlBusArn:
+    Description: EventBridge s3 pre signed url bus arn
+    Value: !GetAtt S3PresignedUrlBus.Arn
+    Export:
+      Name: S3PresignedUrlBusArn

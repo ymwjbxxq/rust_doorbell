@@ -48,9 +48,14 @@ Resources:
               Action: 
                 - dynamodb:PutItem
               Resource: !GetAtt WebSocketTable.Arn
+            - Effect: Allow
+              Action: 
+                - events:PutEvents
+              Resource: !ImportValue S3PresignedUrlBusArn
       Environment:
         Variables:
           TABLE_NAME: !Ref WebSocketTable
+          S3_PRE_SIGNED_BUS: !ImportValue S3PresignedUrlBusName
 
   OnConnectFunctionResourcePermission:
     Type: AWS::Lambda::Permission
