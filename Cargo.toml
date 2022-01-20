@@ -8,6 +8,7 @@ edition = "2021"
 [dependencies]
 aws-config = "0.5.1"
 aws-sdk-dynamodb = "0.5.0"
+aws-sdk-eventbridge = "0.5.0"
 aws-sdk-s3 = "0.5.0"
 aws-types = "0.5.1"
 chrono = "0.4.19"
@@ -26,3 +27,7 @@ path = "src/bin/on-connect.rs"
 [[bin]]
 name = "on-disconnect"
 path = "src/bin/on-disconnect.rs"
+
+[[bin]]
+name = "s3-presigned-url"
+path = "src/bin/s3-presigned-url.rs"
