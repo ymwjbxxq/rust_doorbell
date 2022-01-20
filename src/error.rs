@@ -1,4 +1,7 @@
+use aws_sdk_dynamodb::SdkError;
+use aws_sdk_dynamodb::model::AttributeValue;
 use std::fmt;
+use std::error;
 
 #[derive(Debug)]
 pub enum ApplicationError {
@@ -21,3 +24,17 @@ impl fmt::Display for ApplicationError {
   }
 }
 
+impl From<&AttributeValue> for ApplicationError {
+    fn from(_: &AttributeValue) -> ApplicationError {
+        ApplicationError::InternalError("Invalid value type".to_string())
+    }
+}
+
+impl<E> From<SdkError<E>> for ApplicationError
+where
+    E: error::Error,
+{
+    fn from(value: SdkError<E>) -> ApplicationError {
+        ApplicationError::InternalError(format!("AWS Failure: {:?}", value))
+    }
+}
