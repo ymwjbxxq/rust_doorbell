@@ -1,4 +1,4 @@
-FUNCTIONS := on-connect on-disconnect
+FUNCTIONS := on-connect on-disconnect s3-presigned-url
 STACK_NAME := rust-doorbell
 ARCH := aarch64-unknown-linux-gnu
 
@@ -15,10 +15,12 @@ build-%:
 deploy:
 	sam deploy --guided --no-fail-on-empty-changeset --no-confirm-changeset --profile test --stack-name ${STACK_NAME}-s3 --template-file ./infrastructure/s3-template.yml
 	sam deploy --guided --no-fail-on-empty-changeset --no-confirm-changeset --profile test --stack-name ${STACK_NAME}-stepfunction --template-file ./infrastructure/stepfunction-template.yml
+	sam deploy --guided --no-fail-on-empty-changeset --no-confirm-changeset --profile test --stack-name ${STACK_NAME}-s3presignedurl --template-file ./infrastructure/s3presignedurl-template.yml
 	sam deploy --guided --no-fail-on-empty-changeset --no-confirm-changeset --profile test --stack-name ${STACK_NAME}-websocket --template-file ./infrastructure/websocket-template.yml
 	
 
 delete:
 	sam delete --profile test --stack-name ${STACK_NAME}-stepfunction
 	sam delete --profile test --stack-name ${STACK_NAME}-s3
+	sam delete --profile test --stack-name ${STACK_NAME}-s3presignedurl-template
 	sam delete --profile test --stack-name ${STACK_NAME}-websocket
