@@ -18,7 +18,7 @@ impl AWSConfig {
     aws_client
   }
 
-  fn dynamo_client(&self) -> aws_sdk_dynamodb::Client {
+  pub fn dynamo_client(&self) -> aws_sdk_dynamodb::Client {
     aws_sdk_dynamodb::Client::new(&self.config)
   }
 

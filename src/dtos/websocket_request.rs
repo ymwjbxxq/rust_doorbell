@@ -2,7 +2,7 @@ use serde::{Deserialize, Serialize};
 
 #[derive(Deserialize, Debug, Clone)]
 #[serde(rename_all = "camelCase")]
-pub struct Event {
+pub struct WebSocketRequest {
     pub request_context: RequestContext,
 }
 
