@@ -1,6 +1,3 @@
-use tracing::{info, instrument};
-
-/// Setup tracing
 pub fn setup_tracing() {
   let subscriber = tracing_subscriber::fmt()
     .with_env_filter(tracing_subscriber::EnvFilter::from_default_env())
