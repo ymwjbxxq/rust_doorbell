@@ -13,11 +13,11 @@ build-%:
 	cp -v ./target/$(ARCH)/release/$* ./build/$*/bootstrap
 
 deploy:
-	# sam deploy --guided --no-fail-on-empty-changeset --no-confirm-changeset --profile test --stack-name ${STACK_NAME}-s3 --template-file ./infrastructure/s3-template.yml
-	# sam deploy --guided --no-fail-on-empty-changeset --no-confirm-changeset --profile test --stack-name ${STACK_NAME}-stepfunction --template-file ./infrastructure/stepfunction-template.yml
-	# sam deploy --guided --no-fail-on-empty-changeset --no-confirm-changeset --profile test --stack-name ${STACK_NAME}-eventbridge --template-file ./infrastructure/eventbridge-template.yml
-	sam deploy --guided --no-fail-on-empty-changeset --no-confirm-changeset --profile test --stack-name ${STACK_NAME}-websocket --template-file ./infrastructure/websocket-template.yml
-	sam deploy --guided --no-fail-on-empty-changeset --no-confirm-changeset --profile test --stack-name ${STACK_NAME}-s3presignedurl --template-file ./infrastructure/s3presignedurl-template.yml
+	sam deploy --guided --no-fail-on-empty-changeset --no-confirm-changeset --profile test --stack-name ${STACK_NAME}-s3 							--template-file ./infrastructure/s3-template.yml
+	sam deploy --guided --no-fail-on-empty-changeset --no-confirm-changeset --profile test --stack-name ${STACK_NAME}-stepfunction		--template-file ./infrastructure/stepfunction-template.yml
+	sam deploy --guided --no-fail-on-empty-changeset --no-confirm-changeset --profile test --stack-name ${STACK_NAME}-eventbridge 		--template-file ./infrastructure/eventbridge-template.yml
+	sam deploy --guided --no-fail-on-empty-changeset --no-confirm-changeset --profile test --stack-name ${STACK_NAME}-websocket 			--template-file ./infrastructure/websocket-template.yml
+	sam deploy --guided --no-fail-on-empty-changeset --no-confirm-changeset --profile test --stack-name ${STACK_NAME}-s3presignedurl 	--template-file ./infrastructure/s3presignedurl-template.yml
 	
 
 delete:
