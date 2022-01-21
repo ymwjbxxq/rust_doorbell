@@ -11,6 +11,8 @@ pub struct WebSocketRequest {
 pub struct RequestContext {
     pub event_type: EventType,
     pub connection_id: String,
+    pub domain_name: String,
+    pub stage: String,
 }
 
 #[derive(Serialize, Deserialize, Debug, Clone)]

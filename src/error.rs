@@ -1,5 +1,3 @@
-use aws_sdk_dynamodb::SdkError;
-use aws_sdk_dynamodb::model::AttributeValue;
 use std::fmt;
 use std::error;
 
@@ -24,17 +22,23 @@ impl fmt::Display for ApplicationError {
   }
 }
 
-impl From<&AttributeValue> for ApplicationError {
-    fn from(_: &AttributeValue) -> ApplicationError {
-        ApplicationError::InternalError("Invalid value type".to_string())
+impl From<serde_json::error::Error> for ApplicationError {
+    fn from(value: serde_json::error::Error) -> ApplicationError {
+        ApplicationError::ClientError(format!("Cannot convert to stirng {}", value))
     }
 }
 
-impl<E> From<SdkError<E>> for ApplicationError
+impl From<&aws_sdk_dynamodb::model::AttributeValue> for ApplicationError {
+    fn from(value: &aws_sdk_dynamodb::model::AttributeValue) -> ApplicationError {
+        ApplicationError::InternalError(format!("{:?}", value))
+    }
+}
+
+impl<E> From<aws_sdk_dynamodb::SdkError<E>> for ApplicationError
 where
     E: error::Error,
 {
-    fn from(value: SdkError<E>) -> ApplicationError {
-        ApplicationError::InternalError(format!("AWS Failure: {:?}", value))
+    fn from(value: aws_sdk_dynamodb::SdkError<E>) -> ApplicationError {
+        ApplicationError::InternalError(format!("{:?}", value))
     }
 }

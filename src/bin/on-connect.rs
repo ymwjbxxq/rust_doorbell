@@ -1,13 +1,16 @@
+use aws_sdk_eventbridge::model::PutEventsRequestEntry;
 use chrono::Duration;
 use chrono::Utc;
+use lambda_runtime::{handler_fn, Context, Error};
+use rust_doorbell::aws::client::AWSClient;
+use rust_doorbell::aws::client::AWSConfig;
+use rust_doorbell::dtos::connected_event::ConnectedEvent;
+use rust_doorbell::dtos::websocket_request::WebSocketRequest;
 use rust_doorbell::error::ApplicationError;
 use rust_doorbell::models::connection::Connection;
-use rust_doorbell::aws::client::AWSConfig;
-use rust_doorbell::dtos::websocket_request::WebSocketRequest;
-use lambda_runtime::{handler_fn, Context, Error};
-use tracing::{info};
-use rust_doorbell::{utils::*};
+use rust_doorbell::utils::*;
 use serde_json::{json, Value};
+use tracing::info;
 
 #[tokio::main]
 async fn main() -> Result<(), Error> {
@@ -15,39 +18,69 @@ async fn main() -> Result<(), Error> {
   // Initialize AWS client
   let config = aws_config::load_from_env().await;
   let config = AWSConfig::set_config(config);
-  let dynamo_client = config.dynamo_client();
+  let aws_client = config.on_connect();
 
   lambda_runtime::run(handler_fn(|event: WebSocketRequest, ctx: Context| {
-    execute(&dynamo_client, event, ctx)
+    execute(&aws_client, event, ctx)
   }))
   .await?;
   Ok(())
 }
 
-pub async fn execute(dynamo_client: &aws_sdk_dynamodb::Client, event: WebSocketRequest, _ctx: Context) -> Result<Value, ApplicationError> {
+pub async fn execute(aws_client: &AWSClient, event: WebSocketRequest, _ctx: Context) -> Result<Value, ApplicationError> {
   info!("EVENT {:?}", event);
 
   let connection = Connection {
-    connection_id: event.request_context.connection_id,
+    connection_id: event.request_context.connection_id.clone(),
     ttl_expire_at: (Utc::now() + Duration::seconds(120)).timestamp(),
   };
 
-  add_connection(&dynamo_client, connection).await?;
+  add_connection(&aws_client, connection).await?;
+  send_event(&aws_client, &event).await?;
 
   Ok(json!({
-        "statusCode": 200
-    }))
+      "statusCode": 200
+  }))
 }
 
-async fn add_connection(client: &aws_sdk_dynamodb::Client, connection: Connection) -> Result<(), ApplicationError> {
+async fn add_connection(aws_client: &AWSClient, connection: Connection) -> Result<(), ApplicationError> {
   let table_name = std::env::var("TABLE_NAME").expect("TABLE_NAME must be set");
 
-  let _res = client
-      .put_item()
-      .table_name(&table_name)
-      .set_item(Some(connection.to_dynamodb()))
-      .send()
-      .await?;
+  let _res = aws_client.dynamo_db_client.as_ref().unwrap()
+    .put_item()
+    .table_name(&table_name)
+    .set_item(Some(connection.to_dynamodb()))
+    .send()
+    .await?;
 
   Ok(())
 }
+
+async fn send_event(aws_client: &AWSClient, event: &WebSocketRequest) -> Result<(), ApplicationError> {
+  let bus_name = std::env::var("EVENT_BUS_NAME").expect("EVENT_BUS_NAME must be set");
+
+  let message = ConnectedEvent {
+    connection_id: event.request_context.connection_id.clone(),
+    endpoint: format!(
+      "https://{domain_name}/{stage}",
+      domain_name = event.request_context.domain_name,
+      stage = event.request_context.stage
+    ),
+  };
+  let put_events_request_entry = PutEventsRequestEntry::builder()
+    .event_bus_name(bus_name)
+    .source("doorbell.onconnect")
+    .detail_type("connected")
+    .detail(serde_json::to_string(&message)?)
+    .build();
+
+  let result = aws_client.event_bridge.as_ref().unwrap()
+    .put_events()
+    .entries(put_events_request_entry)
+    .send()
+    .await?;
+
+  info!("EventBridge {:?}", result);
+  Ok(())
+}
+ 

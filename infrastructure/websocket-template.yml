@@ -42,20 +42,18 @@ Resources:
       CodeUri: ../build/on-connect/
       Policies:
         - AWSLambdaBasicExecutionRole
+        - EventBridgePutEventsPolicy:
+            EventBusName: !ImportValue S3PresignedUrlBusName
         - Version: "2012-10-17"
           Statement:
             - Effect: Allow
               Action: 
                 - dynamodb:PutItem
               Resource: !GetAtt WebSocketTable.Arn
-            - Effect: Allow
-              Action: 
-                - events:PutEvents
-              Resource: !ImportValue S3PresignedUrlBusArn
       Environment:
         Variables:
           TABLE_NAME: !Ref WebSocketTable
-          S3_PRE_SIGNED_BUS: !ImportValue S3PresignedUrlBusName
+          EVENT_BUS_NAME: !ImportValue S3PresignedUrlBusName
 
   OnConnectFunctionResourcePermission:
     Type: AWS::Lambda::Permission
