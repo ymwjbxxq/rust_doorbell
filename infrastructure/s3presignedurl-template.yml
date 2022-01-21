@@ -17,14 +17,6 @@ Globals:
 
 Resources:
 ##########################################################################
-#   EventBridge                                                          #
-##########################################################################
-  S3PresignedUrlBus:
-    Type: AWS::Events::EventBus
-    Properties:
-      Name: !Ref AWS::StackName
-
-##########################################################################
 #   Lambda Function                                                      #
 ##########################################################################
 
@@ -47,7 +39,7 @@ Resources:
               Action:
                 - "execute-api:ManageConnections"
               Resource:
-                - !Sub arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:*/*
+                - !ImportValue WebSocketPostArn
       Environment:
         Variables:
           BUCKET_NAME: !ImportValue SourceBucket
@@ -55,7 +47,7 @@ Resources:
         Trigger:
           Type: EventBridgeRule
           Properties:
-            EventBusName: !GetAtt S3PresignedUrlBus.Name
+            EventBusName: !ImportValue S3PresignedUrlBusName
             Pattern:
               source:
                 - doorbell.onconnect
@@ -63,13 +55,6 @@ Resources:
                 - "connected"
 
 Outputs:
-  S3PresignedUrlBusName:
-    Description: EventBridge s3 pre signed url bus name
-    Value: !Ref S3PresignedUrlBus
-    Export:
-      Name: S3PresignedUrlBusName
-  S3PresignedUrlBusArn:
-    Description: EventBridge s3 pre signed url bus arn
-    Value: !GetAtt S3PresignedUrlBus.Arn
-    Export:
-      Name: S3PresignedUrlBusArn
+  S3PresignedUrlLambdaFunction:
+    Description: "S3PresignedUrl function ARN"
+    Value: !GetAtt S3PresignedUrlLambdaFunction.Arn
