@@ -28,6 +28,16 @@ impl AWSConfig {
     aws_client
   }
 
+  pub fn on_s3_presigned_url(&self) -> AWSClient {
+    let aws_client = AWSClient {
+      dynamo_db_client: None,
+      event_bridge: None,
+      s3_client: Some(self.s3_client()),
+    };
+
+    aws_client
+  }
+
   fn dynamo_client(&self) -> aws_sdk_dynamodb::Client {
     aws_sdk_dynamodb::Client::new(&self.config)
   }

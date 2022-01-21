@@ -42,3 +42,11 @@ where
         ApplicationError::InternalError(format!("{:?}", value))
     }
 }
+
+// aws_sdk_s3::presigning::config::Error
+
+impl From<aws_sdk_s3::presigning::config::Error> for ApplicationError {
+    fn from(value: aws_sdk_s3::presigning::config::Error) -> ApplicationError {
+        ApplicationError::InternalError(format!("{:?}", value))
+    }
+}
