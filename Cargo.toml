@@ -19,6 +19,7 @@ serde_json = "1.0.68"
 tokio = "1.13.0"
 tracing = "0.1"
 tracing-subscriber = { version = "0.2", features = ["fmt", "json"] }
+uuid = { version = "0.8", features = ["v4"] }
 
 [[bin]]
 name = "on-connect"

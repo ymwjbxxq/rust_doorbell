@@ -1,6 +1,6 @@
 
 use std::time::Duration;
-
+use uuid::Uuid;
 use aws_sdk_s3::presigning::config::PresigningConfig;
 use rust_doorbell::error::ApplicationError;
 use lambda_runtime::{handler_fn, Context, Error};
@@ -29,14 +29,13 @@ pub async fn execute(aws_client: &AWSClient, event: S3PresignedUrlRequest, _ctx:
   info!("EVENT {:?}", event);
 
   let result = get_s3_presigned_url(&aws_client).await?;
-  info!("RESULT {:?}", result);
 
   Ok(())
 }
 
 async fn get_s3_presigned_url(aws_client: &AWSClient) -> Result<String, ApplicationError> {
   let bucket = std::env::var("BUCKET_NAME").expect("BUCKET_NAME must be set");
-  let random_key = "asdasdasdasdasdad";
+  let random_key = Uuid::new_v4().to_string();
   let expires_in_1_day = Duration::new(86400, 0); 
 
   let presigned_request = aws_client.s3_client.as_ref().unwrap()
@@ -45,7 +44,6 @@ async fn get_s3_presigned_url(aws_client: &AWSClient) -> Result<String, Applicat
       .key(random_key)
       .presigned(PresigningConfig::expires_in(expires_in_1_day)?)
       .await?;
-  println!("From client: {:?}", presigned_request.uri());
 
   Ok(presigned_request.uri().to_string())
 }
