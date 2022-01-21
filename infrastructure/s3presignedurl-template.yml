@@ -41,6 +41,13 @@ Resources:
                 - "s3:PutObject"
               Resource:
                 - !ImportValue SourceBucketArn
+        - Version: "2012-10-17"
+          Statement:
+            - Effect: Allow
+              Action:
+                - "execute-api:ManageConnections"
+              Resource:
+                - !Sub arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:*/*
       Environment:
         Variables:
           BUCKET_NAME: !ImportValue SourceBucket

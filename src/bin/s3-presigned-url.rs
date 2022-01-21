@@ -1,5 +1,8 @@
 
 use std::time::Duration;
+use aws_sdk_apigatewaymanagement::{config, Blob, Client, Endpoint, Region, PKG_VERSION};
+
+
 use uuid::Uuid;
 use aws_sdk_s3::presigning::config::PresigningConfig;
 use rust_doorbell::error::ApplicationError;
@@ -19,7 +22,7 @@ async fn main() -> Result<(), Error> {
   let aws_client = config.on_s3_presigned_url();
 
   lambda_runtime::run(handler_fn(|event: S3PresignedUrlRequest, ctx: Context| {
-    execute(&aws_client,event, ctx)
+    execute(&aws_client, event, ctx)
   }))
   .await?;
   Ok(())
@@ -28,7 +31,8 @@ async fn main() -> Result<(), Error> {
 pub async fn execute(aws_client: &AWSClient, event: S3PresignedUrlRequest, _ctx: Context) -> Result<(), ApplicationError> {
   info!("EVENT {:?}", event);
 
-  let result = get_s3_presigned_url(&aws_client).await?;
+  let presigned_url = get_s3_presigned_url(&aws_client).await?;
+  send_websocket_response(&aws_client, event, &presigned_url).await?;
 
   Ok(())
 }
@@ -46,4 +50,24 @@ async fn get_s3_presigned_url(aws_client: &AWSClient) -> Result<String, Applicat
       .await?;
 
   Ok(presigned_request.uri().to_string())
+}
+
+async fn send_websocket_response(aws_client: &AWSClient, event: S3PresignedUrlRequest, presigned_url: &String) -> Result<(), ApplicationError> {
+
+  let endpoint = Endpoint::immutable(event.detail.endpoint.parse().unwrap());
+
+  let config = aws_config::load_from_env().await;
+  let api_management_config = config::Builder::from(&config)
+      .endpoint_resolver(endpoint)
+      .build();
+  let client = Client::from_conf(api_management_config);
+
+  client
+      .post_to_connection()
+      .connection_id(event.detail.connection_id)
+      .data(Blob::new(presigned_url.as_bytes()))
+      .send()
+      .await?;
+
+  Ok(())
 }
