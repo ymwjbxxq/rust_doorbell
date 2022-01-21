@@ -42,6 +42,8 @@ Resources:
       CodeUri: ../build/on-connect/
       Policies:
         - AWSLambdaBasicExecutionRole
+        - EventBridgePutEventsPolicy:
+            EventBusName: !ImportValue S3PresignedUrlBusName
         - Version: "2012-10-17"
           Statement:
             - Effect: Allow
@@ -51,6 +53,7 @@ Resources:
       Environment:
         Variables:
           TABLE_NAME: !Ref WebSocketTable
+          EVENT_BUS_NAME: !ImportValue S3PresignedUrlBusName
 
   OnConnectFunctionResourcePermission:
     Type: AWS::Lambda::Permission
@@ -165,3 +168,8 @@ Outputs:
   WebSocketURL:
     Description: "The WSS Protocol URL to connect to"
     Value: !Join [ '', [ wss://, !Ref WebSocketApi, .execute-api.,!Ref AWS::Region,.amazonaws.com/,!Ref Stage] ]
+  WebSocketPostArn:
+    Description: "WebSocketPostArn"
+    Value: !Join [ ':', [ arn:aws:execute-api, !Ref AWS::Region, !Ref AWS::AccountId, '*/*'] ]
+    Export:
+      Name: WebSocketPostArn
