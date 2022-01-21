@@ -24,9 +24,35 @@ Resources:
     Properties:
       Name: !Ref AWS::StackName
 
+  #EventBridge rules and permissions
+  EventRuleInsert:
+    Type: AWS::Events::Rule
+    Properties:
+      Description: "Insert transactions"
+      EventBusName: !GetAtt S3PresignedUrlBus.Arn
+      EventPattern:
+        source:
+          - "doorbell.onconnect"
+        detail-type:
+          - connected
+      State: "ENABLED"
+      Targets:
+        -
+          Arn: !GetAtt S3PresignedUrlLambdaFunction.Arn
+          Id: "eventRuleInsert"
+
 ##########################################################################
 #   Lambda Function                                                      #
 ##########################################################################
+  PermissionForEventsToInvokeLambda: 
+    Type: AWS::Lambda::Permission
+    Properties: 
+      FunctionName: 
+        Ref: S3PresignedUrlLambdaFunction
+      Action: "lambda:InvokeFunction"
+      Principal: "events.amazonaws.com"
+      SourceArn: !GetAtt EventRuleInsert.Arn
+
   S3PresignedUrlLambdaFunction:
     Type: AWS::Serverless::Function
     Properties:
@@ -43,16 +69,16 @@ Resources:
       Environment:
         Variables:
           TABLE_NAME: !ImportValue SourceBucket
-      Events:
-        Trigger:
-          Type: EventBridgeRule 
-          Properties:
-            Pattern:
-              detail:
-                source:
-                  - doorbell.onconnect
-                eventName:
-                  - Connected
+      # Events:
+      #   Trigger:
+      #     Type: EventBridgeRule
+      #     EventBusName: !Ref S3PresignedUrlBus
+      #     Properties:
+      #       Pattern:
+      #         source:
+      #           - doorbell.onconnect
+      #         detail-type:
+      #           - "connected"
 
 Outputs:
   S3PresignedUrlBusName:
