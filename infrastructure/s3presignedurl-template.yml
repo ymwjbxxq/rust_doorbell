@@ -43,7 +43,7 @@ Resources:
                 - !ImportValue SourceBucketArn
       Environment:
         Variables:
-          TABLE_NAME: !ImportValue SourceBucket
+          BUCKET_NAME: !ImportValue SourceBucket
       Events:
         Trigger:
           Type: EventBridgeRule
