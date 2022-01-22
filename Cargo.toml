@@ -33,3 +33,11 @@ path = "src/bin/on-disconnect.rs"
 [[bin]]
 name = "s3-presigned-url"
 path = "src/bin/s3-presigned-url.rs"
+
+[[bin]]
+name = "generate-code"
+path = "src/bin/generate-code.rs"
+
+[[bin]]
+name = "send-code"
+path = "src/bin/send-code.rs"

@@ -1,6 +1,5 @@
 use std::time::Duration;
 use aws_sdk_apigatewaymanagement::{config, Blob, Client, Endpoint};
-use uuid::Uuid;
 use aws_sdk_s3::presigning::config::PresigningConfig;
 use rust_doorbell::error::ApplicationError;
 use lambda_runtime::{handler_fn, Context, Error};
@@ -27,15 +26,18 @@ async fn main() -> Result<(), Error> {
 pub async fn execute(aws_client: &AWSClient, event: S3PresignedUrlRequest, _ctx: Context) -> Result<(), ApplicationError> {
   info!("EVENT {:?}", event);
 
-  let presigned_url = get_s3_presigned_url(&aws_client).await?;
-  send_websocket_response(event, &presigned_url).await?;
+  let presigned_url = get_s3_presigned_url(&event, &aws_client).await?;
+  send_websocket_response(&event, &presigned_url).await?;
 
   Ok(())
 }
 
-async fn get_s3_presigned_url(aws_client: &AWSClient) -> Result<String, ApplicationError> {
+async fn get_s3_presigned_url(event: &S3PresignedUrlRequest, aws_client: &AWSClient) -> Result<String, ApplicationError> {
   let bucket = std::env::var("BUCKET_NAME").expect("BUCKET_NAME must be set");
-  let random_key = Uuid::new_v4().to_string();
+  let random_key = format!(
+      "guest/{connection_id}",
+      connection_id = &event.detail.connection_id,
+    );
   let expires_in_1_day = Duration::new(86400, 0); 
 
   let presigned_request = aws_client.s3_client.as_ref().unwrap()
@@ -48,7 +50,7 @@ async fn get_s3_presigned_url(aws_client: &AWSClient) -> Result<String, Applicat
   Ok(presigned_request.uri().to_string())
 }
 
-async fn send_websocket_response(event: S3PresignedUrlRequest, presigned_url: &String) -> Result<(), ApplicationError> {
+async fn send_websocket_response(event: &S3PresignedUrlRequest, presigned_url: &String) -> Result<(), ApplicationError> {
   let endpoint = Endpoint::immutable(event.detail.endpoint.parse().unwrap());
   let config = aws_config::load_from_env().await;
   let api_management_config = config::Builder::from(&config)
@@ -57,7 +59,7 @@ async fn send_websocket_response(event: S3PresignedUrlRequest, presigned_url: &S
 
   Client::from_conf(api_management_config)
       .post_to_connection()
-      .connection_id(event.detail.connection_id)
+      .connection_id(&event.detail.connection_id)
       .data(Blob::new(presigned_url.as_bytes()))
       .send()
       .await?;

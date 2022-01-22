@@ -1,26 +1,34 @@
 {
   "Comment": "Compare face flow",
-  "StartAt": "CompareFaces",
+  "StartAt": "Map input",
   "States": {
+    "Map input": {
+      "Type": "Pass",
+      "Next": "CompareFaces",
+      "Parameters": {
+        "bucketName.$": "$.bucket.name",
+        "input.$": "$.object.key"
+      }
+    },
     "CompareFaces": {
       "Type": "Task",
       "Parameters": {
         "SimilarityThreshold": 70,
         "SourceImage": {
           "S3Object": {
-            "Bucket.$": "$.buckeName",
+            "Bucket.$": "$.bucketName",
             "Name": "source.jpeg"
           }
         },
         "TargetImage": {
           "S3Object": {
-            "Bucket.$": "$.buckeName",
+            "Bucket.$": "$.bucketName",
             "Name.$": "$.input"
           }
         }
       },
       "Resource": "arn:aws:states:::aws-sdk:rekognition:compareFaces",
-      "Next": "If Face Match?",
+      "Next": "Map CompareFaces",
       "Catch": [
         {
           "ErrorEquals": [
@@ -28,7 +36,17 @@
           ],
           "Next": "Not Human"
         }
-      ]
+      ],
+      "ResultPath": "$.output"
+    },
+    "Map CompareFaces": {
+      "Type": "Pass",
+      "Next": "If Face Match?",
+      "Parameters": {
+        "bucketName.$": "$.bucketName",
+        "input.$": "$.input",
+        "faceMatches.$": "$.output.FaceMatches"
+      }
     },
     "Not Human": {
       "Type": "Fail"
@@ -39,18 +57,34 @@
         {
           "And": [
             {
-              "Variable": "$.FaceMatches[0]",
+              "Variable": "$.faceMatches",
               "IsPresent": true
             },
             {
-              "Variable": "$.FaceMatches[0].Face.Confidence",
+              "Variable": "$.faceMatches[0].Face.Confidence",
               "NumericGreaterThan": 70
             }
           ],
-          "Next": "Success"
+          "Next": "Generate code"
         }
       ],
       "Default": "Fail"
+    },
+    "Generate code": {
+      "Type": "Task",
+      "Resource": "${GenerateCodeFunctionArn}",
+      "Parameters": {
+        "Payload.$": "$"
+      },
+      "Next": "Send code"
+    },
+    "Send code": {
+      "Type": "Task",
+      "Resource": "${SendCodeFunctionArn}",
+      "Parameters": {
+        "Payload.$": "$"
+      },
+      "Next": "Success"
     },
     "Success": {
       "Type": "Succeed"
