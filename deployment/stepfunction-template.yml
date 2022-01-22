@@ -23,7 +23,9 @@ Resources:
               Action:
                 - "s3:GetObject"
               Resource:
-                - !ImportValue SourceBucketArn
+                - !Sub
+                  - "${SourceBucketArn}/*"
+                  - SourceBucketArn: !ImportValue SourceBucketArn
       Logging:
         Destinations:
           - CloudWatchLogsLogGroup:
