@@ -1,20 +1,28 @@
 {
   "Comment": "Compare face flow",
-  "StartAt": "CompareFaces",
+  "StartAt": "Pass",
   "States": {
+    "Pass": {
+      "Type": "Pass",
+      "Next": "CompareFaces",
+      "Parameters": {
+        "bucketName.$": "$.bucket.name",
+        "input.$": "$.object.key"
+      }
+    },
     "CompareFaces": {
       "Type": "Task",
       "Parameters": {
         "SimilarityThreshold": 70,
         "SourceImage": {
           "S3Object": {
-            "Bucket.$": "$.buckeName",
+            "Bucket.$": "$.bucketName",
             "Name": "source.jpeg"
           }
         },
         "TargetImage": {
           "S3Object": {
-            "Bucket.$": "$.buckeName",
+            "Bucket.$": "$.bucketName",
             "Name.$": "$.input"
           }
         }
