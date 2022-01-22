@@ -6,7 +6,7 @@
       "Type": "Pass",
       "Next": "CompareFaces",
       "Parameters": {
-        "bucketName.$": "$.bucket.name",
+        "bucket_name.$": "$.bucket.name",
         "input.$": "$.object.key"
       }
     },
@@ -16,13 +16,13 @@
         "SimilarityThreshold": 70,
         "SourceImage": {
           "S3Object": {
-            "Bucket.$": "$.bucketName",
+            "Bucket.$": "$.bucket_name",
             "Name": "source.jpeg"
           }
         },
         "TargetImage": {
           "S3Object": {
-            "Bucket.$": "$.bucketName",
+            "Bucket.$": "$.bucket_name",
             "Name.$": "$.input"
           }
         }
@@ -43,7 +43,7 @@
       "Type": "Pass",
       "Next": "If Face Match?",
       "Parameters": {
-        "bucketName.$": "$.bucketName",
+        "bucket_name.$": "$.bucket_name",
         "input.$": "$.input",
         "faceMatches.$": "$.output.FaceMatches"
       }
@@ -76,6 +76,7 @@
       "Parameters": {
         "Payload.$": "$"
       },
+      "ResultPath": "$.code",
       "Next": "Send code"
     },
     "Send code": {
