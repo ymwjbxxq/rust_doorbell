@@ -2,6 +2,19 @@ AWSTemplateFormatVersion: 2010-09-09
 Transform: AWS::Serverless-2016-10-31
 Description: StepFunctions state machine
 
+# Global values that are applied to all applicable resources in this template
+Globals:
+  Function:
+    MemorySize: 1024
+    Architectures: ["arm64"]
+    Handler: bootstrap
+    Runtime: provided.al2
+    Timeout: 29
+    Environment:
+      Variables:
+        RUST_BACKTRACE: 1
+        RUST_LOG: info
+
 Resources:
 ##########################################################################
 #   STEP FUNCTION                                                        #
@@ -10,6 +23,9 @@ Resources:
     Type: AWS::Serverless::StateMachine
     Properties:
       DefinitionUri: statemachine/stateMachine.asl.json
+      DefinitionSubstitutions:
+        GenerateCodeFunctionArn: !GetAtt GenerateCodeFunction.Arn
+        SendCodeFunctionArn: !GetAtt SendCodeFunction.Arn
       Policies:
         - Version: "2012-10-17"
           Statement:
@@ -19,6 +35,12 @@ Resources:
                 - "logs:*"
                 - "rekognition:CompareFaces"
               Resource: "*"
+            - Effect: Allow
+              Action:
+                - "lambda:InvokeFunction"
+              Resource: 
+                - !GetAtt GenerateCodeFunction.Arn
+                - !GetAtt SendCodeFunction.Arn
             - Effect: Allow
               Action:
                 - "s3:GetObject"
@@ -54,6 +76,31 @@ Resources:
     Type: AWS::Logs::LogGroup
     Properties:
       LogGroupName: !Join [ "/", [ "stepfunctions", MyStateMachine]]
+
+##########################################################################
+#   Lambda Function                                                      #
+##########################################################################
+
+  GenerateCodeFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: ../build/generate-code/
+      Policies:
+        - AWSLambdaBasicExecutionRole
+  
+  SendCodeFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: ../build/send-code/
+      Policies:
+        - AWSLambdaBasicExecutionRole
+        - Version: "2012-10-17"
+          Statement:
+            - Effect: Allow
+              Action:
+                - "execute-api:ManageConnections"
+              Resource:
+                - !ImportValue WebSocketPostArn
 
 Outputs:
   MyStateMachine:

@@ -1,8 +1,8 @@
 {
   "Comment": "Compare face flow",
-  "StartAt": "Pass",
+  "StartAt": "Map input",
   "States": {
-    "Pass": {
+    "Map input": {
       "Type": "Pass",
       "Next": "CompareFaces",
       "Parameters": {
@@ -28,7 +28,7 @@
         }
       },
       "Resource": "arn:aws:states:::aws-sdk:rekognition:compareFaces",
-      "Next": "If Face Match?",
+      "Next": "Map CompareFaces",
       "Catch": [
         {
           "ErrorEquals": [
@@ -36,7 +36,17 @@
           ],
           "Next": "Not Human"
         }
-      ]
+      ],
+      "ResultPath": "$.output"
+    },
+    "Map CompareFaces": {
+      "Type": "Pass",
+      "Next": "If Face Match?",
+      "Parameters": {
+        "bucketName.$": "$.bucketName",
+        "input.$": "$.input",
+        "faceMatches.$": "$.output.FaceMatches"
+      }
     },
     "Not Human": {
       "Type": "Fail"
@@ -47,18 +57,34 @@
         {
           "And": [
             {
-              "Variable": "$.FaceMatches[0]",
+              "Variable": "$.faceMatches",
               "IsPresent": true
             },
             {
-              "Variable": "$.FaceMatches[0].Face.Confidence",
+              "Variable": "$.faceMatches[0].Face.Confidence",
               "NumericGreaterThan": 70
             }
           ],
-          "Next": "Success"
+          "Next": "Generate code"
         }
       ],
       "Default": "Fail"
+    },
+    "Generate code": {
+      "Type": "Task",
+      "Resource": "${GenerateCodeFunctionArn}",
+      "Parameters": {
+        "Payload.$": "$"
+      },
+      "Next": "Send code"
+    },
+    "Send code": {
+      "Type": "Task",
+      "Resource": "${SendCodeFunctionArn}",
+      "Parameters": {
+        "Payload.$": "$"
+      },
+      "Next": "Success"
     },
     "Success": {
       "Type": "Succeed"
