@@ -168,6 +168,11 @@ Outputs:
   WebSocketURL:
     Description: "The WSS Protocol URL to connect to"
     Value: !Join [ '', [ wss://, !Ref WebSocketApi, .execute-api.,!Ref AWS::Region,.amazonaws.com/,!Ref Stage] ]
+  WebSocketDomain:
+    Description: "The WSS domain"
+    Value: !Join [ '', [ !Ref WebSocketApi, .execute-api.,!Ref AWS::Region,.amazonaws.com/,!Ref Stage] ]
+    Export:
+      Name: WebSocketDomain
   WebSocketPostArn:
     Description: "WebSocketPostArn"
     Value: !Join [ ':', [ arn:aws:execute-api, !Ref AWS::Region, !Ref AWS::AccountId, '*/*'] ]

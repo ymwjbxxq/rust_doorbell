@@ -96,11 +96,18 @@ Resources:
         - AWSLambdaBasicExecutionRole
         - Version: "2012-10-17"
           Statement:
+##########################################################################
+# this is wrong we should push to the mobile app not to the doorbell
+# this is here only to simulate and facilitate testing
             - Effect: Allow
               Action:
-                - "execute-api:ManageConnections"
+                - "execute-api:ManageConnections" 
               Resource:
                 - !ImportValue WebSocketPostArn
+      Environment:
+        Variables:
+          WSS_DOMAIN: !ImportValue WebSocketDomain 
+##########################################################################
 
 Outputs:
   MyStateMachine:
