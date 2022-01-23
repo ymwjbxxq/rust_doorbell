@@ -33,6 +33,9 @@ Resources:
                 - "s3:PutObject"
               Resource:
                 - !ImportValue SourceBucketArn
+                - !Sub
+                  - "${SourceBucketArn}/*"
+                  - SourceBucketArn: !ImportValue SourceBucketArn
         - Version: "2012-10-17"
           Statement:
             - Effect: Allow
@@ -43,6 +46,7 @@ Resources:
       Environment:
         Variables:
           BUCKET_NAME: !ImportValue SourceBucket
+          WSS_DOMAIN: !ImportValue WebSocketDomain
       Events:
         Trigger:
           Type: EventBridgeRule
