@@ -24,7 +24,7 @@ impl fmt::Display for ApplicationError {
 
 impl From<serde_json::error::Error> for ApplicationError {
     fn from(value: serde_json::error::Error) -> ApplicationError {
-        ApplicationError::ClientError(format!("Cannot convert to stirng {}", value))
+        ApplicationError::ClientError(format!("Cannot convert to string {}", value))
     }
 }
 
