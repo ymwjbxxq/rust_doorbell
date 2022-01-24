@@ -19,7 +19,7 @@ Resources:
 ##########################################################################
 #   STEP FUNCTION                                                        #
 ##########################################################################
-  MyStateMachine:
+  CompareFaceStateMachine:
     Type: AWS::Serverless::StateMachine
     Properties:
       DefinitionUri: statemachine/stateMachine.asl.json
@@ -51,7 +51,7 @@ Resources:
       Logging:
         Destinations:
           - CloudWatchLogsLogGroup:
-              LogGroupArn: !GetAtt MyStateMachineLogGroup.Arn
+              LogGroupArn: !GetAtt CompareFaceStateMachineLogGroup.Arn
         IncludeExecutionData: false
         Level: 'ALL'
       Events:
@@ -66,16 +66,19 @@ Resources:
                 bucket:
                   name: 
                     - !ImportValue SourceBucket
+                object:
+                  key: 
+                    - prefix: 'guest/'
                 reason:
                   - PutObject
 
 ##########################################################################
 #  STEP FUNCTION LOG GROUP                                               #
 ##########################################################################
-  MyStateMachineLogGroup:
+  CompareFaceStateMachineLogGroup:
     Type: AWS::Logs::LogGroup
     Properties:
-      LogGroupName: !Join [ "/", [ "stepfunctions", MyStateMachine]]
+      LogGroupName: !Join [ "/", [ "stepfunctions", CompareFaceStateMachine]]
 
 ##########################################################################
 #   Lambda Function                                                      #
@@ -110,6 +113,6 @@ Resources:
 ##########################################################################
 
 Outputs:
-  MyStateMachine:
-    Value: !Ref MyStateMachine
-    Description: MyStateMachine Arn
+  CompareFaceStateMachine:
+    Value: !Ref CompareFaceStateMachine
+    Description: CompareFaceStateMachine Arn
