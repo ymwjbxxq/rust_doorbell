@@ -34,7 +34,7 @@ pub async fn execute(aws_client: &AWSClient, event: S3PresignedUrlRequest, _ctx:
 
 async fn get_s3_presigned_url(event: &S3PresignedUrlRequest, aws_client: &AWSClient) -> Result<String, ApplicationError> {
   let bucket = std::env::var("BUCKET_NAME").expect("BUCKET_NAME must be set");
-  let random_key = format!(
+  let s3_key = format!(
       "guest/{connection_id}/guest.jpeg",
       connection_id = &event.detail.connection_id,
     );
@@ -42,7 +42,7 @@ async fn get_s3_presigned_url(event: &S3PresignedUrlRequest, aws_client: &AWSCli
   let presigned_request = aws_client.s3_client.as_ref().unwrap()
       .put_object()
       .bucket(&bucket)
-      .key(random_key)
+      .key(s3_key)
       .presigned(PresigningConfig::expires_in(Duration::new(300, 0))?)
       .await?;
 
