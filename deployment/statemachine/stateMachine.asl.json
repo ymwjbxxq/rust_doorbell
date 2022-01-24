@@ -34,7 +34,8 @@
           "ErrorEquals": [
             "Rekognition.InvalidParameterException"
           ],
-          "Next": "Not Human"
+          "Next": "Map face not match",
+          "ResultPath": "$.error"
         }
       ],
       "ResultPath": "$.output"
@@ -47,9 +48,6 @@
         "input.$": "$.input",
         "faceMatches.$": "$.output.FaceMatches"
       }
-    },
-    "Not Human": {
-      "Type": "Fail"
     },
     "If Face Match?": {
       "Type": "Choice",
