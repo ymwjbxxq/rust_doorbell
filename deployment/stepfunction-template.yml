@@ -26,6 +26,7 @@ Resources:
       DefinitionSubstitutions:
         GenerateCodeFunctionArn: !GetAtt GenerateCodeFunction.Arn
         SendCodeFunctionArn: !GetAtt SendCodeFunction.Arn
+        SendPhotoToMobileArn: !GetAtt SendPhotoToMobile.Arn
       Policies:
         - Version: "2012-10-17"
           Statement:
@@ -41,6 +42,7 @@ Resources:
               Resource: 
                 - !GetAtt GenerateCodeFunction.Arn
                 - !GetAtt SendCodeFunction.Arn
+                - !GetAtt SendPhotoToMobile.Arn
             - Effect: Allow
               Action:
                 - "s3:GetObject"
@@ -109,6 +111,36 @@ Resources:
                 - !ImportValue WebSocketPostArn
       Environment:
         Variables:
+          WSS_DOMAIN: !ImportValue WebSocketDomain 
+##########################################################################
+
+  SendPhotoToMobile:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: ../build/send-photo/
+      Policies:
+        - AWSLambdaBasicExecutionRole
+        - Version: "2012-10-17"
+          Statement:
+            - Effect: Allow
+              Action:
+                - "s3:GetObject"
+              Resource:
+                - !ImportValue SourceBucketArn
+                - !Sub
+                  - "${SourceBucketArn}/*"
+                  - SourceBucketArn: !ImportValue SourceBucketArn
+##########################################################################
+# this is wrong we should push to the mobile app not to the doorbell
+# this is here only to simulate and facilitate testing
+            - Effect: Allow
+              Action:
+                - "execute-api:ManageConnections" 
+              Resource:
+                - !ImportValue WebSocketPostArn
+      Environment:
+        Variables:
+          BUCKET_NAME: !ImportValue SourceBucket
           WSS_DOMAIN: !ImportValue WebSocketDomain 
 ##########################################################################
 

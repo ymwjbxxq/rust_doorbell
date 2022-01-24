@@ -1,4 +1,4 @@
-FUNCTIONS := on-connect on-disconnect s3-presigned-url generate-code send-code
+FUNCTIONS := on-connect on-disconnect s3-presigned-url generate-code send-code send-photo
 STACK_NAME := rust-doorbell
 ARCH := aarch64-unknown-linux-gnu
 

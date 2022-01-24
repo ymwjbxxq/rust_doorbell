@@ -42,3 +42,7 @@ path = "src/bin/generate-code.rs"
 [[bin]]
 name = "send-code"
 path = "src/bin/send-code.rs"
+
+[[bin]]
+name = "send-photo"
+path = "src/bin/send-photo.rs"
