@@ -82,9 +82,6 @@
     "Send code": {
       "Type": "Task",
       "Resource": "${SendCodeFunctionArn}",
-      "Parameters": {
-        "Payload.$": "$"
-      },
       "Next": "Success"
     },
     "Success": {
