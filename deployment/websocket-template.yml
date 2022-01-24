@@ -169,8 +169,8 @@ Outputs:
     Description: "The WSS Protocol URL to connect to"
     Value: !Join [ '', [ wss://, !Ref WebSocketApi, .execute-api.,!Ref AWS::Region,.amazonaws.com/,!Ref Stage] ]
   WebSocketDomain:
-    Description: "The WSS domain"
-    Value: !Join [ '', [ !Ref WebSocketApi, .execute-api.,!Ref AWS::Region,.amazonaws.com/,!Ref Stage] ]
+    Description: "The WS https domain"
+    Value: !Join [ '', [ https://, !Ref WebSocketApi, .execute-api.,!Ref AWS::Region,.amazonaws.com/,!Ref Stage] ]
     Export:
       Name: WebSocketDomain
   WebSocketPostArn:
