@@ -61,6 +61,10 @@
               "IsPresent": true
             },
             {
+              "Variable": "$.faceMatches[0]",
+              "IsPresent": true
+            },
+            {
               "Variable": "$.faceMatches[0].Face.Confidence",
               "NumericGreaterThan": 70
             }
