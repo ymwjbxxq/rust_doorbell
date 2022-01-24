@@ -5,7 +5,7 @@ Smart doorbells include a camera, microphone and speaker to allow for a two-way 
 This project is concentrated on the backend side of communication. Therefore, I will not consider the hardware and the mobile app.
 You can find a series of articles [here](https://dfrasca.hashnode.dev/series/project-doorbell)
 
-### How it works ###
+## How it works ##
 
 ![picture](https://github.com/ymwjbxxq/rust_doorbell/blob/main/readme/citofono.jpeg)
 
@@ -17,6 +17,8 @@ You can find a series of articles [here](https://dfrasca.hashnode.dev/series/pro
 - Doorbell upload the photo to S3
 - S3 PUT will generate an event to EventBridge and execute the Step Function.
 - Step Function is comparing the face
+
+![picture](https://github.com/ymwjbxxq/rust_doorbell/blob/main/readme/stepfunctions_graph.png)
 
 If we have a match:
 
@@ -30,7 +32,7 @@ If we have do not have a match:
 - Let the doorbell ring
 - Send a photo to the mobile app
 
-### HOW TO DEPLOY ###
+## HOW TO DEPLOY ##
 
 The project will deploy the following AWS services:
 
@@ -70,6 +72,18 @@ If everything is all working, you should have in your AWS Account something like
 Inside the rust-doorbell-websocket stack, you can find the WebSocket URL. It should look like
 
 wss://xxxxx.execute-api.eu-central-1.amazonaws.com/prod
+
+### Face match ###
+
+![picture](https://github.com/ymwjbxxq/rust_doorbell/blob/main/readme/iter1.png)
+
+### Face does not match ###
+
+![picture](https://github.com/ymwjbxxq/rust_doorbell/blob/main/readme/iter2.png)
+
+### Face is not human ###
+
+![picture](https://github.com/ymwjbxxq/rust_doorbell/blob/main/readme/iter3.png)
 
 ### Testing ###
 
