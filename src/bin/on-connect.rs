@@ -61,11 +61,6 @@ async fn send_event(aws_client: &AWSClient, event: &WebSocketRequest) -> Result<
 
   let message = ConnectedEvent {
     connection_id: event.request_context.connection_id.clone(),
-    endpoint: format!(
-      "https://{domain_name}/{stage}",
-      domain_name = event.request_context.domain_name,
-      stage = event.request_context.stage
-    ),
   };
   let put_events_request_entry = PutEventsRequestEntry::builder()
     .event_bus_name(bus_name)

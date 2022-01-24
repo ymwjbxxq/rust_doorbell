@@ -35,23 +35,23 @@ pub async fn execute(aws_client: &AWSClient, event: S3PresignedUrlRequest, _ctx:
 async fn get_s3_presigned_url(event: &S3PresignedUrlRequest, aws_client: &AWSClient) -> Result<String, ApplicationError> {
   let bucket = std::env::var("BUCKET_NAME").expect("BUCKET_NAME must be set");
   let random_key = format!(
-      "guest/{connection_id}",
+      "guest/{connection_id}/guest.jpeg",
       connection_id = &event.detail.connection_id,
     );
-  let expires_in_1_day = Duration::new(86400, 0); 
 
   let presigned_request = aws_client.s3_client.as_ref().unwrap()
       .put_object()
       .bucket(&bucket)
       .key(random_key)
-      .presigned(PresigningConfig::expires_in(expires_in_1_day)?)
+      .presigned(PresigningConfig::expires_in(Duration::new(300, 0))?)
       .await?;
 
   Ok(presigned_request.uri().to_string())
 }
 
 async fn send_websocket_response(event: &S3PresignedUrlRequest, presigned_url: &String) -> Result<(), ApplicationError> {
-  let endpoint = Endpoint::immutable(event.detail.endpoint.parse().unwrap());
+  let domain = std::env::var("WSS_DOMAIN").expect("WSS_DOMAIN must be set");
+  let endpoint = Endpoint::immutable(domain.parse().unwrap());
   let config = aws_config::load_from_env().await;
   let api_management_config = config::Builder::from(&config)
       .endpoint_resolver(endpoint)

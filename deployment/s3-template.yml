@@ -9,6 +9,16 @@ Resources:
   SourceBucket:
     Type: AWS::S3::Bucket
     Properties:
+      CorsConfiguration:
+        CorsRules:
+        - AllowedHeaders:
+            - "*"
+          AllowedMethods:
+            - GET
+            - PUT
+            - HEAD
+          AllowedOrigins:
+            - "*"
       NotificationConfiguration:
         EventBridgeConfiguration:
           EventBridgeEnabled: True

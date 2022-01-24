@@ -8,5 +8,4 @@ pub struct S3PresignedUrlRequest {
 #[derive(Deserialize, Debug, Clone)]
 pub struct DetailMessage {
   pub connection_id: String,
-  pub endpoint: String,
 }
