@@ -5,13 +5,18 @@ pub enum ResponseType {
     Error(String),
     Code(SendCodeResponse),
     Audio(AudioResponse),
+    Photo(PhotoResponse),
 }
 
 #[derive(Clone, Debug, Deserialize, PartialEq, Serialize)]
 pub struct SendCodeRequest {
     pub input: String,
-    pub bucket_name: String,
     pub code: String,
+}
+
+#[derive(Clone, Debug, Deserialize, PartialEq, Serialize)]
+pub struct SendPhotoRequest {
+    pub input: String,
 }
 
 #[derive(Clone, Debug, Deserialize, PartialEq, Serialize)]
@@ -21,6 +26,10 @@ pub struct SendCodeResponse {
 
 #[derive(Clone, Debug, Deserialize, PartialEq, Serialize)]
 pub struct AudioResponse {
-    pub input: String,
-    pub bucket_name: String,
+    pub url: String,
+}
+
+#[derive(Clone, Debug, Deserialize, PartialEq, Serialize)]
+pub struct PhotoResponse {
+    pub url: String,
 }

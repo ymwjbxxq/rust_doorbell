@@ -72,7 +72,7 @@
           "Next": "Generate code"
         }
       ],
-      "Default": "Fail"
+      "Default": "Map face not match"
     },
     "Generate code": {
       "Type": "Task",
@@ -83,6 +83,18 @@
       "ResultPath": "$.code",
       "Next": "Send code"
     },
+    "Map face not match": {
+      "Type": "Pass",
+      "Next": "Send photo to mobile",
+      "Parameters": {
+        "input.$": "$.input"
+      }
+    },
+    "Send photo to mobile": {
+      "Type": "Task",
+      "Resource": "${SendPhotoToMobileArn}",
+      "Next": "Success"
+    },
     "Send code": {
       "Type": "Task",
       "Resource": "${SendCodeFunctionArn}",
@@ -90,9 +102,6 @@
     },
     "Success": {
       "Type": "Succeed"
-    },
-    "Fail": {
-      "Type": "Fail"
     }
   }
 }
