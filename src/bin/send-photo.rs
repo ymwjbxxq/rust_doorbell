@@ -1,10 +1,9 @@
-use rust_doorbell::modules::web_socket::{PostWebSocketRequest, Socket, WebSocket};
-use aws_sdk_s3::presigning::config::PresigningConfig;
-use std::time::Duration;
+use rust_doorbell::modules::{web_socket::{PostWebSocketRequest, Socket, WebSocket}, s3_presigned_url::{GetPresignedUrl, PresignedUrl, PresignedUrlRequest, S3PresignedUrlContext}};
 use lambda_runtime::{handler_fn, Context, Error};
 use rust_doorbell::{error::ApplicationError, dtos::compare_face_dto::{SendPhotoRequest, ResponseType, PhotoResponse}, aws::client::{AWSConfig, AWSClient}};
 use tracing::info;
 use rust_doorbell::utils::*;
+use std::time::Duration;
 
 #[tokio::main]
 async fn main() -> Result<(), Error> {
@@ -24,7 +23,7 @@ async fn main() -> Result<(), Error> {
 pub async fn execute(aws_client: &AWSClient, event: SendPhotoRequest, _ctx: Context) -> Result<String, ApplicationError> {
   info!("EVENT {:?}", event);
 
-  let presigned_url = get_s3_presigned_url(&event, &aws_client).await?;
+  let presigned_url = generate_s3_presigned_url(&event, &aws_client).await?;
 
   let v: Vec<&str> = event.input.split('/').collect();
   post_to_web_socket(&v[1].to_string(), &presigned_url).await?;
@@ -32,17 +31,17 @@ pub async fn execute(aws_client: &AWSClient, event: SendPhotoRequest, _ctx: Cont
   Ok(String::from("url sent"))
 }
 
-async fn get_s3_presigned_url(event: &SendPhotoRequest, aws_client: &AWSClient) -> Result<String, ApplicationError> {
-  let bucket = std::env::var("BUCKET_NAME").expect("BUCKET_NAME must be set");
+async fn generate_s3_presigned_url(event: &SendPhotoRequest, aws_client: &AWSClient) -> Result<String, ApplicationError> {
+    let bucket = std::env::var("BUCKET_NAME").expect("BUCKET_NAME must be set");
+    let request = PresignedUrlRequest {
+        bucket_name: bucket,
+        object_key: event.input.to_string(),
+        duration: Duration::new(300, 0)
+    };
+    let strategy = GetPresignedUrl::new(aws_client.s3_client.as_ref().unwrap()).await;
+    let url = S3PresignedUrlContext::generate(strategy, &request).await?;
 
-  let presigned_request = aws_client.s3_client.as_ref().unwrap()
-      .get_object()
-      .bucket(&bucket)
-      .key(&event.input)
-      .presigned(PresigningConfig::expires_in(Duration::new(300, 0))?)
-      .await?;
-
-  Ok(presigned_request.uri().to_string())
+    Ok(url)
 }
 
 async fn post_to_web_socket(connection_id: &String, presigned_url: &String) -> Result<(), ApplicationError> {
