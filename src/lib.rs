@@ -3,3 +3,4 @@ pub mod utils;
 pub mod dtos;
 pub mod aws;
 pub mod models;
+pub mod modules;

@@ -1,11 +1,12 @@
 use serde::{Deserialize, Serialize};
 
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Serialize, Deserialize, Clone, PartialEq)]
 pub enum ResponseType {
     Error(String),
     Code(SendCodeResponse),
     Audio(AudioResponse),
     Photo(PhotoResponse),
+    S3Url(UrlResponse),
 }
 
 #[derive(Clone, Debug, Deserialize, PartialEq, Serialize)]
@@ -31,5 +32,10 @@ pub struct AudioResponse {
 
 #[derive(Clone, Debug, Deserialize, PartialEq, Serialize)]
 pub struct PhotoResponse {
+    pub url: String,
+}
+
+#[derive(Clone, Debug, Deserialize, PartialEq, Serialize)]
+pub struct UrlResponse {
     pub url: String,
 }
