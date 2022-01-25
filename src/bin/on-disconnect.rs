@@ -24,24 +24,24 @@ async fn main() -> Result<(), Error> {
 }
 
 pub async fn execute(aws_client: &AWSClient, event: WebSocketRequest, _ctx: Context) -> Result<Value, ApplicationError> {
-  info!("EVENT {:?}", event);
+    info!("EVENT {:?}", event);
 
-  delete_connection(&aws_client, &event.request_context.connection_id).await?;
+    delete_connection(&aws_client, &event.request_context.connection_id).await?;
 
-  Ok(json!({
+    Ok(json!({
         "statusCode": 200
     }))
 }
 
 async fn delete_connection(aws_client: &AWSClient, connection_id: &str) -> Result<(), ApplicationError> {
-  let table_name = std::env::var("TABLE_NAME").expect("TABLE_NAME must be set");
+    let table_name = std::env::var("TABLE_NAME").expect("TABLE_NAME must be set");
 
-  let _res = aws_client.dynamo_db_client.as_ref().unwrap()
-      .delete_item()
-      .table_name(&table_name)
-      .key("connection_id", AttributeValue::S(connection_id.to_string()))
-      .send()
-      .await?;
+    let _res = aws_client.dynamo_db_client.as_ref().unwrap()
+        .delete_item()
+        .table_name(&table_name)
+        .key("connection_id", AttributeValue::S(connection_id.to_string()))
+        .send()
+        .await?;
 
-  Ok(())
+    Ok(())
 }
