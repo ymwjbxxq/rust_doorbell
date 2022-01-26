@@ -1,6 +1,6 @@
 #[derive(Debug)]
 pub struct AWSConfig {
-    config: aws_types::config::Config,
+    pub config: aws_types::config::Config,
 }
 
 impl AWSConfig {
@@ -8,11 +8,16 @@ impl AWSConfig {
         Self { config }
     }
 
+    fn get_config(&self) -> aws_types::config::Config {
+        self.config.clone()
+    }
+
     pub fn on_connect(&self) -> AWSClient {
         let aws_client = AWSClient {
+            config: self.get_config(),
             dynamo_db_client: Some(self.dynamo_client()),
-            event_bridge: Some(self.event_bridge_client()),
             s3_client: None,
+            event_bridge: Some(self.event_bridge_client()),
         };
 
         aws_client
@@ -20,9 +25,10 @@ impl AWSConfig {
 
     pub fn on_disconnect(&self) -> AWSClient {
         let aws_client = AWSClient {
+            config: self.get_config(),
             dynamo_db_client: Some(self.dynamo_client()),
-            event_bridge: None,
             s3_client: None,
+            event_bridge: None,
         };
 
         aws_client
@@ -30,9 +36,10 @@ impl AWSConfig {
 
     pub fn on_s3_presigned_url(&self) -> AWSClient {
         let aws_client = AWSClient {
+            config: self.get_config(),
             dynamo_db_client: None,
-            event_bridge: None,
             s3_client: Some(self.s3_client()),
+            event_bridge: None,
         };
 
         aws_client
@@ -53,6 +60,7 @@ impl AWSConfig {
 
 #[derive(Clone, Debug)]
 pub struct AWSClient {
+    pub config: aws_types::config::Config,
     pub dynamo_db_client: Option<aws_sdk_dynamodb::Client>,
     pub s3_client: Option<aws_sdk_s3::Client>,
     pub event_bridge: Option<aws_sdk_eventbridge::Client>,
