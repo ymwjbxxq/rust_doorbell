@@ -2,7 +2,6 @@ use async_trait::async_trait;
 use aws_sdk_apigatewaymanagement::{config, Blob, Client, Endpoint};
 use serde::{Deserialize, Serialize};
 use crate::{dtos::compare_face_dto::ResponseType, error::ApplicationError};
-use aws_config;
 
 #[derive(Clone, Debug, Deserialize, PartialEq, Serialize)]
 pub struct PostWebSocketRequest {
@@ -12,7 +11,7 @@ pub struct PostWebSocketRequest {
 
 #[async_trait]
 pub trait Socket {
-    async fn new() -> Self;
+    async fn new(config: &aws_types::config::Config) -> Self;
     async fn post(self, request: &PostWebSocketRequest) -> Result<(), ApplicationError>;
 }
 
@@ -22,11 +21,10 @@ pub struct WebSocket {
 
 #[async_trait]
 impl Socket for WebSocket {
-    async fn new() -> Self {
+    async fn new(config: &aws_types::config::Config) -> Self {
         let domain = std::env::var("WSS_DOMAIN").expect("WSS_DOMAIN must be set");
         let endpoint = Endpoint::immutable(domain.parse().unwrap());
-        let config = aws_config::load_from_env().await;
-        let api_management_config = config::Builder::from(&config)
+        let api_management_config = config::Builder::from(config)
             .endpoint_resolver(endpoint)
             .build();
         Self { 
