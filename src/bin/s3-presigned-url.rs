@@ -28,7 +28,7 @@ pub async fn execute(aws_client: &AWSClient, event: S3PresignedUrlRequest, _ctx:
     info!("EVENT {:?}", event);
 
     let presigned_url = generate_s3_presigned_url(&event, &aws_client).await?;
-    post_to_web_socket(&event, &presigned_url).await?;
+    post_to_web_socket(&event, &presigned_url, &aws_client).await?;
 
     Ok(())
 }
@@ -50,12 +50,11 @@ async fn generate_s3_presigned_url(event: &S3PresignedUrlRequest, aws_client: &A
     Ok(url)
 }
 
-async fn post_to_web_socket(event: &S3PresignedUrlRequest, presigned_url: &String) -> Result<(), ApplicationError> {
+async fn post_to_web_socket(event: &S3PresignedUrlRequest, presigned_url: &String, aws_client: &AWSClient) -> Result<(), ApplicationError> {
     let response = ResponseType::S3Url(UrlResponse {
         url: presigned_url.to_string(),
     });
-
-    WebSocket::new()
+    WebSocket::new(&aws_client.config)
         .await
         .post(&PostWebSocketRequest {
             connection_id: event.detail.connection_id.clone(),
