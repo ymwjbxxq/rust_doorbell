@@ -34,7 +34,7 @@ Resources:
 ##########################################################################
 #  API Gateway REST API                                                  #
 ##########################################################################
-  SubscriptionApi:
+  DeviceApi:
     Type: AWS::Serverless::Api
     Properties:
       StageName: !Ref StageName
@@ -56,17 +56,17 @@ Resources:
 ##########################################################################
 #   Lambda Function                                                      #
 ##########################################################################
-  SubscriptionFunction:
+  DeviceFunction:
     Type: AWS::Serverless::Function
     Properties:
-      CodeUri: ../build/subscription
+      CodeUri: ../build/device
       Policies:
         - AWSLambdaBasicExecutionRole
         - Version: "2012-10-17"
           Statement:
             - Effect: Allow
               Action: 
-                - dynamodb:PutItem
+                - dynamodb:UpdateItem
               Resource: !ImportValue DynamodbTableArn
       Environment:
         Variables:
@@ -75,11 +75,11 @@ Resources:
         ApiEvents:
           Type: Api
           Properties:
-            Path: /subscription
+            Path: /device
             Method: POST
-            RestApiId: !Ref SubscriptionApi
+            RestApiId: !Ref DeviceApi
 
 Outputs:
   HttpApiEndpoint:
-    Description: The Subscription endpoint.
-    Value: !Sub "https://${SubscriptionApi}.execute-api.${AWS::Region}.amazonaws.com/${StageName}/"
+    Description: The Device endpoint.
+    Value: !Sub "https://${DeviceApi}.execute-api.${AWS::Region}.amazonaws.com/${StageName}/"

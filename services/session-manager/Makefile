@@ -1,4 +1,4 @@
-FUNCTIONS := subscription
+FUNCTIONS := subscription device
 STACK_NAME := session-manager
 ARCH := aarch64-unknown-linux-gnu
 ARCH_SPLIT = $(subst -, ,$(ARCH))
@@ -23,7 +23,9 @@ build-%:
 deploy:
 	sam deploy --guided --no-fail-on-empty-changeset --no-confirm-changeset --profile test --stack-name ${STACK_NAME}-dynamodb 						--template-file ./deployment/dynamodb.yml
 	sam deploy --guided --no-fail-on-empty-changeset --no-confirm-changeset --profile test --stack-name ${STACK_NAME}-subscription-api 		--template-file ./deployment/subscription-api.yml
+	sam deploy --guided --no-fail-on-empty-changeset --no-confirm-changeset --profile test --stack-name ${STACK_NAME}-device-api 		--template-file ./deployment/device-api.yml
 
 delete:
 	sam delete --profile test --stack-name ${STACK_NAME}-subscription-api
+	sam delete --profile test --stack-name ${STACK_NAME}-device-api
 	sam delete --profile test --stack-name ${STACK_NAME}-dynamodb

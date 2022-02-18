@@ -8,6 +8,10 @@ edition = "2021"
 name = "subscription"
 path = "src/bin/subscription.rs"
 
+[[bin]]
+name = "device"
+path = "src/bin/device.rs"
+
 [dependencies]
 aws-config = "0.6.0"
 aws-sdk-dynamodb = "0.6.0"
