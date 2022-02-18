@@ -21,11 +21,11 @@ build-%:
 	cp -v ../../target/$(ARCH)/release/$* ./build/$*/bootstrap
 
 deploy:
-	sam deploy --guided --no-fail-on-empty-changeset --no-confirm-changeset --profile test --stack-name ${STACK_NAME}-s3 							--template-file ./services/v1/deployment/s3-template.yml
-	sam deploy --guided --no-fail-on-empty-changeset --no-confirm-changeset --profile test --stack-name ${STACK_NAME}-eventbridge 		--template-file ./services/v1/deployment/eventbridge-template.yml
-	sam deploy --guided --no-fail-on-empty-changeset --no-confirm-changeset --profile test --stack-name ${STACK_NAME}-websocket 			--template-file ./services/v1/deployment/websocket-template.yml
-	sam deploy --guided --no-fail-on-empty-changeset --no-confirm-changeset --profile test --stack-name ${STACK_NAME}-s3presignedurl 	--template-file ./services/v1/deployment/s3presignedurl-template.yml
-	sam deploy --guided --no-fail-on-empty-changeset --no-confirm-changeset --profile test --stack-name ${STACK_NAME}-stepfunction		--template-file ./services/v1/deployment/stepfunction-template.yml
+	sam deploy --guided --no-fail-on-empty-changeset --no-confirm-changeset --profile test --stack-name ${STACK_NAME}-s3 							--template-file ./deployment/s3-template.yml
+	sam deploy --guided --no-fail-on-empty-changeset --no-confirm-changeset --profile test --stack-name ${STACK_NAME}-eventbridge 		--template-file ./deployment/eventbridge-template.yml
+	sam deploy --guided --no-fail-on-empty-changeset --no-confirm-changeset --profile test --stack-name ${STACK_NAME}-websocket 			--template-file ./deployment/websocket-template.yml
+	sam deploy --guided --no-fail-on-empty-changeset --no-confirm-changeset --profile test --stack-name ${STACK_NAME}-s3presignedurl 	--template-file ./deployment/s3presignedurl-template.yml
+	sam deploy --guided --no-fail-on-empty-changeset --no-confirm-changeset --profile test --stack-name ${STACK_NAME}-stepfunction		--template-file ./deployment/stepfunction-template.yml
 	
 
 delete:

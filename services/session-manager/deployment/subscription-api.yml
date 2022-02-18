@@ -1,0 +1,90 @@
+AWSTemplateFormatVersion: 2010-09-09
+Transform: 'AWS::Serverless-2016-10-31'
+Description: An Amazon API Gateway HTTP API and an AWS Lambda function.
+
+##########################################################################
+#  Parameters                                                            #
+##########################################################################
+Parameters:
+  VpcId:
+    Description: VPC where the APIGW will be created
+    Type: String
+  StageName:
+    Description: The name of the stage is the first path segment in the Uniform Resource Identifier (URI) of a call to API Gateway
+    Type: String
+    Default: dev
+
+##########################################################################
+#  Global values that are applied to all resources                       #
+##########################################################################
+Globals:
+  Function:
+    MemorySize: 1024
+    Architectures: ["arm64"]
+    Handler: bootstrap
+    Runtime: provided.al2
+    Timeout: 29
+    Environment:
+      Variables:
+        RUST_BACKTRACE: 1
+        RUST_LOG: info
+
+Resources:
+
+##########################################################################
+#  API Gateway REST API                                                  #
+##########################################################################
+  SubscriptionApi:
+    Type: AWS::Serverless::Api
+    Properties:
+      StageName: !Ref StageName
+      Name: !Ref AWS::StackName
+      Description: An Amazon private REST API Gateway and an AWS Lambda function.
+      EndpointConfiguration:
+        Type: PRIVATE
+        VPCEndpointIds: 
+          - !Ref VpcId
+      Auth:
+        ResourcePolicy:
+          CustomStatements: [{
+            "Effect": "Allow",
+            "Principal": "*",
+            "Action": "execute-api:Invoke",
+            "Resource": "execute-api:/*/*/*"
+            # "Condition": {
+            #     "IpAddress": {
+            #         "aws:SourceIp": "1.2.3.4"
+            #     }
+            #   }
+          }]
+
+##########################################################################
+#   Lambda Function                                                      #
+##########################################################################
+  SubscriptionFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: ../build/subscription
+      Policies:
+        - AWSLambdaBasicExecutionRole
+        - Version: "2012-10-17"
+          Statement:
+            - Effect: Allow
+              Action: 
+                - dynamodb:PutItem
+              Resource: !ImportValue DynamodbTableArn
+      Environment:
+        Variables:
+          TABLE_NAME: !ImportValue DynamodbTableName
+      Events:
+        ApiEvents:
+          Type: Api
+          Properties:
+            Path: /subscription
+            Method: POST
+            RestApiId: !Ref SubscriptionApi
+
+Outputs:
+  HttpApiEndpoint:
+    Description: The Subscription endpoint.
+    Value: !Sub "https://${SubscriptionApi}.execute-api.${AWS::Region}.amazonaws.com/${StageName}/"
