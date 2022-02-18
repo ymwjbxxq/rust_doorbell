@@ -36,10 +36,3 @@ println!("EVENT {:?}", subscriptiont_request);
         "statusCode": 201
     }))
 }
-
-// {
-//     "user_id":"1",
-//     "plan_id":"1",
-//     "streams":2,
-//     "devices":3
-// }
