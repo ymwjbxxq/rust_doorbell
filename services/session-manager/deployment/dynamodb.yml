@@ -7,39 +7,46 @@ Resources:
 ##########################################################################
 #  DynamoDB                                                              #
 ##########################################################################
-  DeviceTable:
+  SubscriptionTable:
     Type: AWS::DynamoDB::Table
     Properties:
+      KeySchema:
+        - AttributeName: pk
+          KeyType: HASH
       AttributeDefinitions:
         - AttributeName: pk
           AttributeType: S
       BillingMode: PAY_PER_REQUEST
-      KeySchema:
-        - AttributeName: pk
-          KeyType: HASH
 
   StreamingTable:
     Type: AWS::DynamoDB::Table
     Properties:
-      AttributeDefinitions:
-        - AttributeName: pk
-          AttributeType: S
-      BillingMode: PAY_PER_REQUEST
       KeySchema:
         - AttributeName: pk
           KeyType: HASH
+        - AttributeName: sk
+          KeyType: RANGE
+      AttributeDefinitions:
+        - AttributeName: pk
+          AttributeType: S
+        - AttributeName: sk
+          AttributeType: S
+      TimeToLiveSpecification:
+        AttributeName: ttlExpireAt
+        Enabled: true
+      BillingMode: PAY_PER_REQUEST
 
 Outputs:
-  DeviceTableName:
+  SubscriptionTableName:
     Description: "DynamoDB Device Table Name"
-    Value: !Ref DeviceTable
+    Value: !Ref SubscriptionTable
     Export:
-      Name: DeviceTableName
-  DeviceTableArn:
+      Name: SubscriptionTableName
+  SubscriptionTableArn:
     Description: "DynamoDB Device Table ARN"
-    Value: !GetAtt DeviceTable.Arn
+    Value: !GetAtt SubscriptionTable.Arn
     Export:
-      Name: DeviceTableArn
+      Name: SubscriptionTableArn
   StreamingTableeName:
     Description: "DynamoDB Streaming Table Name"
     Value: !Ref StreamingTable

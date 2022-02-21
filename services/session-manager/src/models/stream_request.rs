@@ -1,7 +1,7 @@
 use serde::Deserialize;
 
 #[derive(Deserialize, Debug, Clone)]
-pub struct DeviceRequest {
+pub struct StreamRequest {
     pub user_id: String,
-    pub device_count: u16,
+    pub video_id: String,
 }

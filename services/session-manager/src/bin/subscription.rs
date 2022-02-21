@@ -34,12 +34,14 @@ async fn main() -> Result<(), E> {
 pub async fn execute(client: &aws_sdk_dynamodb::Client, event: Request) -> Result<impl IntoResponse,E> {
     let body = event.payload()?;
     if let Some(request) = body {
-        let devices = device(&client, &request)
-            .map_err(|_e| ApplicationError::InitError("Could not setup devices".to_string()));
-        let streams = streaming(&client, &request)
-            .map_err(|_e| ApplicationError::InitError("Could not setup streaming".to_string()));
-        let result = try_join!(devices, streams);
-println!("try_join {:?}", result);
+//         let devices = device(&client, &request)
+//             .map_err(|_e| ApplicationError::InitError("Could not setup devices".to_string()));
+//         let streams = streaming(&client, &request)
+//             .map_err(|_e| ApplicationError::InitError("Could not setup streaming".to_string()));
+//         let result = try_join!(devices, streams);
+// println!("try_join {:?}", result);
+
+        let result = device(&client, &request).await;
         if result.is_ok() {
             Ok(response(
                 StatusCode::OK,
@@ -60,7 +62,7 @@ println!("try_join {:?}", result);
 }
 
 async fn device(client: &aws_sdk_dynamodb::Client, request: &SubscriptionRequest) -> Result<(), ApplicationError> {
-    let table = std::env::var("DEVICE_TABLE_NAME").expect("DEVICE_TABLE_NAME must be set");
+    let table = std::env::var("SUBSCRIPTION_TABLE_NAME").expect("SUBSCRIPTION_TABLE_NAME must be set");
     client
         .put_item()
         .table_name(table)
@@ -70,19 +72,6 @@ async fn device(client: &aws_sdk_dynamodb::Client, request: &SubscriptionRequest
             "devices",
             AttributeValue::N(format!("{:}", request.devices)),
         )
-        .send()
-        .await?;
-
-    Ok(())
-}
-
-pub async fn streaming(client: &aws_sdk_dynamodb::Client, request: &SubscriptionRequest) -> Result<(), ApplicationError> {
-    let table = std::env::var("STREAMING_TABLE_NAME").expect("STREAMING_TABLE_NAME must be set");
-    client
-        .put_item()
-        .table_name(table)
-        .item("pk", AttributeValue::S(request.user_id.to_string()))
-        .item("plan_id", AttributeValue::S(request.plan_id.to_string()))
         .item(
             "streams",
             AttributeValue::N(format!("{:}", request.streams)),
@@ -92,6 +81,23 @@ pub async fn streaming(client: &aws_sdk_dynamodb::Client, request: &Subscription
 
     Ok(())
 }
+
+// pub async fn streaming(client: &aws_sdk_dynamodb::Client, request: &SubscriptionRequest) -> Result<(), ApplicationError> {
+//     let table = std::env::var("STREAMING_TABLE_NAME").expect("STREAMING_TABLE_NAME must be set");
+//     client
+//         .put_item()
+//         .table_name(table)
+//         .item("pk", AttributeValue::S(request.user_id.to_string()))
+//         .item("plan_id", AttributeValue::S(request.plan_id.to_string()))
+//         .item(
+//             "streams",
+//             AttributeValue::N(format!("{:}", request.streams)),
+//         )
+//         .send()
+//         .await?;
+
+//     Ok(())
+// }
 
 fn response(status_code: StatusCode, body: String) -> Response<String> {
     Response::builder()

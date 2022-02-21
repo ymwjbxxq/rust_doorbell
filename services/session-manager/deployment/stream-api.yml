@@ -34,7 +34,7 @@ Resources:
 ##########################################################################
 #  API Gateway REST API                                                  #
 ##########################################################################
-  DeviceApi:
+  StreamApi:
     Type: AWS::Serverless::Api
     Properties:
       StageName: !Ref StageName
@@ -56,30 +56,39 @@ Resources:
 ##########################################################################
 #   Lambda Function                                                      #
 ##########################################################################
-  DeviceFunction:
+  StreamFunction:
     Type: AWS::Serverless::Function
     Properties:
-      CodeUri: ../build/device
+      CodeUri: ../build/stream
       Policies:
         - AWSLambdaBasicExecutionRole
         - Version: "2012-10-17"
           Statement:
             - Effect: Allow
-              Action: 
+              Action:
+                - dynamodb:Query
                 - dynamodb:UpdateItem
-              Resource: !ImportValue SubscriptionTableArn
+                - dynamodb:PutItem
+              Resource: 
+                - !ImportValue StreamingTableArn
+            - Effect: Allow
+              Action:
+                - dynamodb:GetItem
+              Resource:
+                - !ImportValue SubscriptionTableArn
       Environment:
         Variables:
-          TABLE_NAME: !ImportValue SubscriptionTableName
+          STREAMING_TABLE_NAME: !ImportValue StreamingTableName
+          SUBSCRIPTION_TABLE_NAME: !ImportValue SubscriptionTableName
       Events:
         ApiEvents:
           Type: Api
           Properties:
-            Path: /device
+            Path: /stream
             Method: POST
-            RestApiId: !Ref DeviceApi
+            RestApiId: !Ref StreamApi
 
 Outputs:
   HttpApiEndpoint:
-    Description: The Device endpoint.
-    Value: !Sub "https://${DeviceApi}.execute-api.${AWS::Region}.amazonaws.com/${StageName}/"
+    Description: The Stream endpoint.
+    Value: !Sub "https://${StreamApi}.execute-api.${AWS::Region}.amazonaws.com/${StageName}/"

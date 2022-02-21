@@ -38,7 +38,7 @@ pub async fn execute(client: &aws_sdk_dynamodb::Client, event: Request) -> Resul
             .update_expression("set devices = devices - :incr")
             .expression_attribute_values(
                 ":incr",
-                AttributeValue::N(format!("{:}", device_request.devices_count)),
+                AttributeValue::N(format!("{:}", device_request.device_count)),
             )
             .expression_attribute_values(":limit", AttributeValue::N(format!("{:}", 0)))
             .condition_expression("attribute_exists(pk) AND devices > :limit")
@@ -56,10 +56,13 @@ pub async fn execute(client: &aws_sdk_dynamodb::Client, event: Request) -> Resul
                   "remaining_devices": attributes.get_number("devices") 
                 }).to_string())
             }
-            _ => response(
+            _ => {
+              println!("ERROR {:?}", result.err().unwrap());
+              response(
                 StatusCode::INTERNAL_SERVER_ERROR,
                 json!({ "message": "Limit reached, move to PRO plan" }).to_string(),
-            ),
+              )
+            },
         })
     } else {
         Ok(response(
@@ -68,6 +71,7 @@ pub async fn execute(client: &aws_sdk_dynamodb::Client, event: Request) -> Resul
         ))
     }
 }
+
 
 fn response(status_code: StatusCode, body: String) -> Response<String> {
     Response::builder()

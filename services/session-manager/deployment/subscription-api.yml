@@ -68,12 +68,10 @@ Resources:
               Action: 
                 - dynamodb:PutItem
               Resource: 
-                - !ImportValue DeviceTableArn
-                - !ImportValue StreamingTableArn
+                - !ImportValue SubscriptionTableArn
       Environment:
         Variables:
-          DEVICE_TABLE_NAME: !ImportValue DeviceTableName
-          STREAMING_TABLE_NAME: !ImportValue StreamingTableName
+          SUBSCRIPTION_TABLE_NAME: !ImportValue SubscriptionTableName
       Events:
         ApiEvents:
           Type: Api
