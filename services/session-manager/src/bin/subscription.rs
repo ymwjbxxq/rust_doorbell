@@ -1,11 +1,22 @@
+use aws_config::{RetryConfig, TimeoutConfig};
 use aws_sdk_dynamodb::model::AttributeValue;
 use lambda_http::{http::StatusCode, service_fn, Body, Error, IntoResponse, Request, Response};
 use serde_json::json;
 use session_manager::models::subscription_request::SubscriptionRequest;
+use std::time::Duration;
 
 #[tokio::main]
 async fn main() -> Result<(), Error> {
-    let config = aws_config::load_from_env().await;
+    let config = aws_config::from_env()
+        .retry_config(RetryConfig::new().with_max_attempts(10))
+        .timeout_config(
+            TimeoutConfig::new()
+                .with_read_timeout(Some(Duration::from_secs(1)))
+                .with_connect_timeout(Some(Duration::from_secs(1)))
+                .with_api_call_timeout(Some(Duration::from_secs(1))),
+        )
+        .load()
+        .await;
     let dynamodb_client = aws_sdk_dynamodb::Client::new(&config);
 
     lambda_http::run(service_fn(|event: Request| {
