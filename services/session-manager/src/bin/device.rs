@@ -1,7 +1,7 @@
 use std::time::Duration;
 use aws_config::{TimeoutConfig, RetryConfig};
 use aws_sdk_dynamodb::model::{AttributeValue, ReturnValue};
-use lambda_http::{http::StatusCode, service_fn, Body, Error, IntoResponse, Request, Response};
+use lambda_http::{http::StatusCode, service_fn, Error, IntoResponse, Request, Response, RequestExt};
 use serde_json::json;
 use session_manager::{models::device_request::DeviceRequest, utils::dynamodb::AttributeValuesExt};
 
@@ -28,17 +28,9 @@ async fn main() -> Result<(), Error> {
 
 pub async fn execute(client: &aws_sdk_dynamodb::Client, event: Request) -> Result<impl IntoResponse, Error> {
     let table = std::env::var("TABLE_NAME").expect("TABLE_NAME must be set");
-    let body: Result<DeviceRequest, serde_json::Error> = match event.body() {
-        Body::Text(body) => serde_json::from_str(body),
-        _ => {
-            return Ok(response(
-                StatusCode::BAD_REQUEST,
-                json!({ "message": "Empty request body" }).to_string(),
-            ));
-        }
-    };
+    let body = event.payload::<DeviceRequest>()?;
 
-    if let Ok(device_request) = body {
+    if let Some(device_request) = body {
         let result = client
             .update_item()
             .table_name(table)

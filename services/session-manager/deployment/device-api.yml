@@ -67,10 +67,10 @@ Resources:
             - Effect: Allow
               Action: 
                 - dynamodb:UpdateItem
-              Resource: !ImportValue DynamodbTableArn
+              Resource: !ImportValue DeviceTableArn
       Environment:
         Variables:
-          TABLE_NAME: !ImportValue DynamodbTableName
+          TABLE_NAME: !ImportValue DeviceTableName
       Events:
         ApiEvents:
           Type: Api

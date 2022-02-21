@@ -67,10 +67,13 @@ Resources:
             - Effect: Allow
               Action: 
                 - dynamodb:PutItem
-              Resource: !ImportValue DynamodbTableArn
+              Resource: 
+                - !ImportValue DeviceTableArn
+                - !ImportValue StreamingTableArn
       Environment:
         Variables:
-          TABLE_NAME: !ImportValue DynamodbTableName
+          DEVICE_TABLE_NAME: !ImportValue DeviceTableName
+          STREAMING_TABLE_NAME: !ImportValue StreamingTableName
       Events:
         ApiEvents:
           Type: Api

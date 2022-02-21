@@ -7,7 +7,18 @@ Resources:
 ##########################################################################
 #  DynamoDB                                                              #
 ##########################################################################
-  Table:
+  DeviceTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      AttributeDefinitions:
+        - AttributeName: pk
+          AttributeType: S
+      BillingMode: PAY_PER_REQUEST
+      KeySchema:
+        - AttributeName: pk
+          KeyType: HASH
+
+  StreamingTable:
     Type: AWS::DynamoDB::Table
     Properties:
       AttributeDefinitions:
@@ -19,13 +30,23 @@ Resources:
           KeyType: HASH
 
 Outputs:
-  DynamodbTableName:
-    Description: "DynamoDB table Name"
-    Value: !Ref Table
+  DeviceTableName:
+    Description: "DynamoDB Device Table Name"
+    Value: !Ref DeviceTable
     Export:
-      Name: DynamodbTableName
-  DynamodbTableArn:
-    Description: "DynamoDB table ARN"
-    Value: !GetAtt Table.Arn
+      Name: DeviceTableName
+  DeviceTableArn:
+    Description: "DynamoDB Device Table ARN"
+    Value: !GetAtt DeviceTable.Arn
     Export:
-      Name: DynamodbTableArn
+      Name: DeviceTableArn
+  StreamingTableeName:
+    Description: "DynamoDB Streaming Table Name"
+    Value: !Ref StreamingTable
+    Export:
+      Name: StreamingTableName
+  StreamingTableArn:
+    Description: "DynamoDB Streaming Table ARN"
+    Value: !GetAtt StreamingTable.Arn
+    Export:
+      Name: StreamingTableArn

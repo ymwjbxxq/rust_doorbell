@@ -21,7 +21,7 @@ build-%:
 	cp -v ../../target/$(ARCH)/release/$* ./build/$*/bootstrap
 
 deploy:
-	sam deploy --guided --no-fail-on-empty-changeset --no-confirm-changeset --profile test --stack-name ${STACK_NAME}-dynamodb 						--template-file ./deployment/dynamodb.yml
+	# sam deploy --guided --no-fail-on-empty-changeset --no-confirm-changeset --profile test --stack-name ${STACK_NAME}-dynamodb 						--template-file ./deployment/dynamodb.yml
 	sam deploy --guided --no-fail-on-empty-changeset --no-confirm-changeset --profile test --stack-name ${STACK_NAME}-subscription-api 		--template-file ./deployment/subscription-api.yml
 	sam deploy --guided --no-fail-on-empty-changeset --no-confirm-changeset --profile test --stack-name ${STACK_NAME}-device-api 		--template-file ./deployment/device-api.yml
 
