@@ -1,6 +1,8 @@
 use std::fmt;
 use std::error;
 
+use aws_sdk_dynamodb::types::SdkError;
+
 #[derive(Debug)]
 pub enum ApplicationError {
     InitError(String),
@@ -34,11 +36,11 @@ impl From<&aws_sdk_dynamodb::model::AttributeValue> for ApplicationError {
     }
 }
 
-impl<E> From<aws_sdk_dynamodb::SdkError<E>> for ApplicationError
+impl<E> From<SdkError<E>> for ApplicationError
 where
     E: error::Error,
 {
-    fn from(value: aws_sdk_dynamodb::SdkError<E>) -> ApplicationError {
-        ApplicationError::InternalError(format!("{:?}", value))
+    fn from(value: SdkError<E>) -> ApplicationError {
+        ApplicationError::SdkError(format!("{}", value))
     }
 }
