@@ -146,6 +146,29 @@ window.onload = function() {
 
 4. Note the outputs from the SAM deployment process. These contain the resource names and/or ARNs used for testing.
 
+
+### Testing ###
+
+In theory this project should be exposed by a PRIVATE API and so in the template there is
+```
+      # EndpointConfiguration:
+      #   Type: PRIVATE
+      #   VPCEndpointIds: 
+      #     - !Ref VpcId
+```
+
+To test the a Private API the steps are:
+
+1. Create an EC2 
+2. Install curl
+
+Run the following:
+```
+curl -X POST -H "content-type:application/json" https://{api_id}.execute-api.{region}.amazonaws.com/{stage}/subscription -d '{"user_id": "3","plan_id": "free","streams": 2, "devices": 3}'
+curl -X POST -H "content-type:application/json" https://{api_id}.execute-api.{region}.amazonaws.com/{stage}/device -d '{"user_id": "3","device_count": 1}'
+curl -X POST -H "content-type:application/json" https://{api_id}.execute-api.{region}.amazonaws.com/{stage}/stream -d '{"user_id": "3","video_id": "1"}'
+```
+
 ### Cleanup ###
 
 1. Delete the stack
