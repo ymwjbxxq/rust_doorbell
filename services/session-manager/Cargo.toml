@@ -17,6 +17,7 @@ name = "stream"
 path = "src/bin/stream.rs"
 
 [dependencies]
+async-trait = "0.1.52"
 aws-config = "0.6.0"
 aws-sdk-dynamodb = "0.6.0"
 aws-types = "0.6.0"

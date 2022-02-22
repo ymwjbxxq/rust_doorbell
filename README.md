@@ -7,11 +7,11 @@ You can find a series of articles [here](https://dfrasca.hashnode.dev/series/pro
 
 ## Structure ##
 
-Microservices split this repository:
+I have split this repository by microservices:
 
 * The orginal idea is [here](https://github.com/ymwjbxxq/rust_doorbell/tree/main/services/v1)
 * Session Manager service is [here](https://github.com/ymwjbxxq/rust_doorbell/tree/main/services/session-manager)
 
-Even if they are not correlated, I keep the code separated because each part is a small experiment.
+Even if they are not correlated, I keep the code separated because each part is a small experiment, and it is possible to see the evolution of libraries and techniques.
 
-The idea is to use some imagination and think that this is the repo of a big company, and different teams and accounts use each service.
+If we imagine this as a repository for a company, we will have different teams and accounts, and each of them will be responsible for a service.
