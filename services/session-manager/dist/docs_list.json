@@ -1,0 +1,14 @@
+[
+  {
+    "url": "docs/device.json",
+    "name": "Device API"
+  },
+  {
+    "url": "docs/stream.json",
+    "name": "Stream API"
+  },
+  {
+    "url": "docs/subscription.json",
+    "name": "Subscription API"
+  }
+]

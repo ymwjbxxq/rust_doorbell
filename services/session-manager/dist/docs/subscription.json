@@ -1,0 +1,90 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "description": "This is the subscription API",
+    "version": "1.0.6",
+    "title": "Subscription API",
+    "termsOfService": "http://daniele.com/terms/",
+    "contact": {
+      "email": "a@a.it"
+    },
+    "license": {
+      "name": "Apache 2.0",
+      "url": "http://www.apache.org/licenses/LICENSE-2.0.html"
+    }
+  },
+  "host": "xxxxxx.execute-api.eu-central-1.amazonaws.com",
+  "basePath": "/dev",
+  "tags": [
+    {
+      "name": "stream",
+      "description": "Private API VPC link must be created"
+    }
+  ],
+  "schemes": [
+    "https"
+  ],
+  "paths": {
+    "/subscription": {
+      "post": {
+        "tags": [
+          "subscription"
+        ],
+        "summary": "Send subscription plan about the user",
+        "description": "",
+        "operationId": "AddSubscription",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "in": "body",
+            "name": "subscription",
+            "description": "User subscription",
+            "schema": {
+              "type": "object",
+              "required": [
+                "user_id",
+                "video_id",
+                "streams",
+                "devices"
+              ],
+              "properties": {
+                "user_id": {
+                  "type": "string",
+                  "example": "someId"
+                },
+                "video_id": {
+                  "type": "string", 
+                  "example": "someId"
+                },
+                "streams": {
+                  "type": "integer",
+                  "example": 2
+                },
+                "devices": {
+                  "type": "integer",
+                  "example": 5
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Subscription added"
+          },
+          "400": {
+            "description": "Failed to parse from request body"
+          },
+          "500": {
+            "description": "Internal error"
+          }
+        }
+      }
+    }
+  }
+}

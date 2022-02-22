@@ -41,8 +41,8 @@ pub async fn execute(
             .await;
         if result.is_ok() {
             Ok(ApiHelper::response(
-                StatusCode::OK,
-                json!({"message": "Subscription inserted"}).to_string(),
+                StatusCode::CREATED,
+                json!({"message": "Subscription added"}).to_string(),
             ))
         } else {
             Ok(ApiHelper::response(

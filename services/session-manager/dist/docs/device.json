@@ -1,0 +1,102 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "description": "This is device API",
+    "version": "1.0.6",
+    "title": "Device API",
+    "termsOfService": "http://daniele.com/terms/",
+    "contact": {
+      "email": "a@a.it"
+    },
+    "license": {
+      "name": "Apache 2.0",
+      "url": "http://www.apache.org/licenses/LICENSE-2.0.html"
+    }
+  },
+  "host": "xxxxxx.execute-api.eu-central-1.amazonaws.com",
+  "basePath": "/dev",
+  "tags": [
+    {
+      "name": "device",
+      "description": "Private API VPC link must be created"
+    }
+  ],
+  "schemes": [
+    "https"
+  ],
+  "paths": {
+    "/device": {
+      "post": {
+        "tags": [
+          "device"
+        ],
+        "summary": "count user device",
+        "description": "",
+        "operationId": "addDevice",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "in": "body",
+            "name": "user",
+            "description": "The device registration",
+            "schema": {
+              "type": "object",
+              "required": [
+                "user_id",
+                "device_count"
+              ],
+              "properties": {
+                "user_id": {
+                  "type": "string",
+                  "example": "someId"
+                },
+                "device_count": {
+                  "type": "integer", 
+                  "example": 1
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "successful operation",
+            "schema": {
+              "$ref": "#/definitions/DeviceResponse"
+            }
+          },
+          "400": {
+            "description": "Failed to parse from request body"
+          },
+          "406": {
+            "description": "Limit reached, move to PRO plan"
+          },
+          "500": {
+            "description": "Internal error"
+          }
+        }
+      }
+    }
+  },
+  "definitions": {
+    "DeviceResponse": {
+      "type": "object",
+      "properties": {
+        "message": {
+          "example": "Remaining devices: 1",
+          "type": "string"
+        },
+        "remaining_devices": {
+          "description": "The number of remaining devices",
+          "example": 1,
+          "type": "integer"
+        }
+      }
+    }
+  }
+}

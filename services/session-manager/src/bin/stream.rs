@@ -73,7 +73,7 @@ pub async fn execute(
             if usize::try_from(allowed_streams).ok().unwrap() == current_streams {
                 return Ok(ApiHelper::response(
                     StatusCode::NOT_ACCEPTABLE,
-                    json!({ "message": "Too many active streams" }).to_string(),
+                    json!({ "message": "Too many active streams, move to PRO plan" }).to_string(),
                 ));
             }
             AddStream::new().await.execute(client, &request).await?;
@@ -83,7 +83,7 @@ pub async fn execute(
             ));
         }
         return Ok(ApiHelper::response(
-            StatusCode::INTERNAL_SERVER_ERROR,
+            StatusCode::NOT_FOUND,
             json!({ "message": "No subscription found" }).to_string(),
         ));
     }

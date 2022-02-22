@@ -40,6 +40,17 @@ Resources:
       StageName: !Ref StageName
       Name: !Ref AWS::StackName
       Description: An Amazon private REST API Gateway and an AWS Lambda function.
+      Models:
+        Input:
+          type: object
+          required:
+            - user_id
+            - device_count
+          properties:
+            user_id:
+              type: string
+            device_count:
+              type: integer
       EndpointConfiguration:
         Type: PRIVATE
         VPCEndpointIds: 
@@ -70,7 +81,7 @@ Resources:
               Resource: !ImportValue SubscriptionTableArn
       Environment:
         Variables:
-          TABLE_NAME: !ImportValue SubscriptionTableName
+          SUBSCRIPTION_TABLE_NAME: !ImportValue SubscriptionTableName
       Events:
         ApiEvents:
           Type: Api

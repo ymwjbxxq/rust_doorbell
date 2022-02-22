@@ -56,7 +56,7 @@ pub async fn execute(
         } else {
             println!("ERROR {:?}", result.err().unwrap());
             Ok(ApiHelper::response(
-                StatusCode::INTERNAL_SERVER_ERROR,
+                StatusCode::NOT_ACCEPTABLE,
                 json!({ "message": "Limit reached, move to PRO plan" }).to_string(),
             ))
         }

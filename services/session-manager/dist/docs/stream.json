@@ -1,0 +1,89 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "description": "This is the stream API",
+    "version": "1.0.6",
+    "title": "Stream API",
+    "termsOfService": "http://daniele.com/terms/",
+    "contact": {
+      "email": "a@a.it"
+    },
+    "license": {
+      "name": "Apache 2.0",
+      "url": "http://www.apache.org/licenses/LICENSE-2.0.html"
+    }
+  },
+  "host": "xxxxxx.execute-api.eu-central-1.amazonaws.com",
+  "basePath": "/dev",
+  "tags": [
+    {
+      "name": "stream",
+      "description": "Private API VPC link must be created"
+    }
+  ],
+  "schemes": [
+    "https"
+  ],
+  "paths": {
+    "/stream": {
+      "post": {
+        "tags": [
+          "stream"
+        ],
+        "summary": "Send ping for user stream",
+        "description": "",
+        "operationId": "Ping",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "in": "body",
+            "name": "stream",
+            "description": "User stream",
+            "schema": {
+              "type": "object",
+              "required": [
+                "user_id",
+                "video_id"
+              ],
+              "properties": {
+                "user_id": {
+                  "type": "string",
+                  "example": "someId"
+                },
+                "video_id": {
+                  "type": "string", 
+                  "example": "someId"
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "TTL updated"
+          },
+          "201": {
+            "description": "Stream added"
+          },
+          "400": {
+            "description": "Failed to parse from request body"
+          },
+          "404": {
+            "description": "No subscription found"
+          },
+          "406": {
+            "description": "Too many active streams, move to PRO plan"
+          },
+          "500": {
+            "description": "Internal error"
+          }
+        }
+      }
+    }
+  }
+}

@@ -40,6 +40,17 @@ Resources:
       StageName: !Ref StageName
       Name: !Ref AWS::StackName
       Description: An Amazon private REST API Gateway and an AWS Lambda function.
+      Models:
+        Input:
+          type: object
+          required:
+            - user_id
+            - video_id
+          properties:
+            user_id:
+              type: string
+            video_id:
+              type: string
       EndpointConfiguration:
         Type: PRIVATE
         VPCEndpointIds: 
