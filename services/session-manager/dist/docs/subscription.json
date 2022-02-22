@@ -80,6 +80,9 @@
           "400": {
             "description": "Failed to parse from request body"
           },
+          "406": {
+            "description": "Subscription already existing"
+          },
           "500": {
             "description": "Internal error"
           }

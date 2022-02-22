@@ -45,9 +45,10 @@ pub async fn execute(
                 json!({"message": "Subscription added"}).to_string(),
             ))
         } else {
+            println!("ERROR {:?}", result.err().unwrap());
             Ok(ApiHelper::response(
-                StatusCode::INTERNAL_SERVER_ERROR,
-                json!({ "message": format!("{:?}", result.err().unwrap()) }).to_string(),
+                StatusCode::NOT_ACCEPTABLE,
+                json!({ "message": "Subscription already existing" }).to_string(),
             ))
         }
     } else {

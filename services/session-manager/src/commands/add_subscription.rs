@@ -35,6 +35,7 @@ impl AddSubscriptionCommanad for AddSubscription {
                 "streams",
                 AttributeValue::N(format!("{:}", request.streams)),
             )
+            .condition_expression("attribute_not_exists(pk)")
             .send()
             .await?;
         Ok(())
