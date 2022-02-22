@@ -57,10 +57,10 @@ Resources:
               type: integer
             devices:
               type: integer
-      EndpointConfiguration:
-        Type: PRIVATE
-        VPCEndpointIds: 
-          - !Ref VpcId
+      # EndpointConfiguration:
+      #   Type: PRIVATE
+      #   VPCEndpointIds: 
+      #     - !Ref VpcId
       Auth:
         ResourcePolicy:
           CustomStatements: [{

@@ -51,10 +51,10 @@ Resources:
               type: string
             device_count:
               type: integer
-      EndpointConfiguration:
-        Type: PRIVATE
-        VPCEndpointIds: 
-          - !Ref VpcId
+      # EndpointConfiguration:
+      #   Type: PRIVATE
+      #   VPCEndpointIds: 
+      #     - !Ref VpcId
       Auth:
         ResourcePolicy:
           CustomStatements: [{

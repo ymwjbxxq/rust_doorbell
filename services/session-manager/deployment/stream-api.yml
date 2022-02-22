@@ -51,10 +51,10 @@ Resources:
               type: string
             video_id:
               type: string
-      EndpointConfiguration:
-        Type: PRIVATE
-        VPCEndpointIds: 
-          - !Ref VpcId
+      # EndpointConfiguration:
+      #   Type: PRIVATE
+      #   VPCEndpointIds: 
+      #     - !Ref VpcId
       Auth:
         ResourcePolicy:
           CustomStatements: [{
