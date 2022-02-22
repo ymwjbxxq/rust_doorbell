@@ -3,7 +3,7 @@ use std::collections::HashMap;
 
 pub trait AttributeValuesExt {
     fn get_string(&self, key: &str) -> Option<String>;
-    fn get_number(&self, key: &str) -> Option<i32>;
+    fn get_number(&self, key: &str) -> Option<i64>;
     fn get_bool(&self, key: &str) -> Option<bool>;
 }
 
@@ -12,8 +12,8 @@ impl AttributeValuesExt for HashMap<String, AttributeValue> {
       Some(self.get(key)?.as_s().ok()?.to_owned())
   }
 
-  fn get_number(&self, key: &str) -> Option<i32> {
-    self.get(key)?.as_n().ok()?.parse::<i32>().ok()
+  fn get_number(&self, key: &str) -> Option<i64> {
+    self.get(key)?.as_n().ok()?.parse().ok()
   }
 
   fn get_bool(&self, key: &str) -> Option<bool> {
