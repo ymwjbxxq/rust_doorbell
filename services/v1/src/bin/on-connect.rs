@@ -26,7 +26,7 @@ async fn main() -> Result<(), Error> {
     .await?;
     Ok(())
 }
-ge
+
 pub async fn execute(aws_client: &AWSClient, event: WebSocketRequest, _ctx: Context) -> Result<Value, ApplicationError> {
     info!("EVENT {:?}", event);
 
