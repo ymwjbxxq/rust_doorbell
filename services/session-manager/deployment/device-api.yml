@@ -89,8 +89,12 @@ Resources:
             Path: /device
             Method: POST
             RestApiId: !Ref DeviceApi
+            RequestModel:
+              Model: Input
+              Required: true
+              ValidateBody: true
 
 Outputs:
   HttpApiEndpoint:
     Description: The Device endpoint.
-    Value: !Sub "https://${DeviceApi}.execute-api.${AWS::Region}.amazonaws.com/${StageName}/"
+    Value: !Sub "https://${DeviceApi}.execute-api.${AWS::Region}.amazonaws.com/${StageName}/device"
