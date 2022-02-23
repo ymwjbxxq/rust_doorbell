@@ -35,6 +35,9 @@ Resources:
         AttributeName: ttlExpireAt
         Enabled: true
       BillingMode: PAY_PER_REQUEST
+      Tags:
+        - Key: Name
+          Value: !Ref AWS::StackName
 
 Outputs:
   SubscriptionTableName:

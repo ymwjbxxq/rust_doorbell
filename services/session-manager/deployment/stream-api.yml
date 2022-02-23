@@ -9,6 +9,15 @@ Parameters:
   VpcId:
     Description: VPC where the APIGW will be created
     Type: String
+  PrivateSubNet1:
+    Description: private subnet of the vpc
+    Type: String
+  PrivateSubNet2:
+    Description: private subnet of the vpc
+    Type: String
+  PrivateSubNet2:
+    Description: private subnet of the vpc
+    Type: String
   StageName:
     Description: The name of the stage is the first path segment in the Uniform Resource Identifier (URI) of a call to API Gateway
     Type: String
@@ -63,6 +72,8 @@ Resources:
             "Action": "execute-api:Invoke",
             "Resource": "execute-api:/*/*/*"
           }]
+      Tags:
+        Name: !Ref AWS::StackName
 
 ##########################################################################
 #   Lambda Function                                                      #
@@ -91,6 +102,8 @@ Resources:
         Variables:
           STREAMING_TABLE_NAME: !ImportValue StreamingTableName
           SUBSCRIPTION_TABLE_NAME: !ImportValue SubscriptionTableName
+      Tags:
+        Name: !Ref AWS::StackName
       Events:
         ApiEvents:
           Type: Api
