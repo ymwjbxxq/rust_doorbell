@@ -1,0 +1,124 @@
+AWSTemplateFormatVersion: 2010-09-09
+Description: DAX
+
+##########################################################################
+#  Parameters                                                            #
+##########################################################################
+Parameters:
+  VpcId:
+    Description: VPC where the APIGW will be created
+    Type: String
+  PrivateSubNet1:
+    Description: private subnet of the vpc
+    Type: String
+  PrivateSubNet2:
+    Description: private subnet of the vpc
+    Type: String
+  PrivateSubNet3:
+    Description: private subnet of the vpc
+    Type: String
+
+Resources:
+##########################################################################
+#  DAX Subnet Group                                                      #
+##########################################################################
+  DAXSubnetGroup:
+    Type: AWS::DAX::SubnetGroup
+    Properties:
+      Description: Subnet group for DAX
+      SubnetIds: 
+        - !Ref PrivateSubNet1
+        - !Ref PrivateSubNet2
+        - !Ref PrivateSubNet3
+
+##########################################################################
+#  DAX Secuirty Group                                                    #
+##########################################################################
+  DAXSecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: Security Group for DAX
+      VpcId: !Ref VpcId
+  
+  DAXSecurityGroupIngress:
+    Type: AWS::EC2::SecurityGroupIngress
+    DependsOn: DAXSecurityGroup
+    Properties:
+      GroupId: !GetAtt DAXSecurityGroup.GroupId
+      IpProtocol: tcp
+      FromPort: 8111
+      ToPort: 8111
+      SourceSecurityGroupId: !GetAtt DAXSecurityGroup.GroupId
+
+##########################################################################
+#  DAX IAM ROle                                                          #
+##########################################################################
+  DAXRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Statement:
+          - Action:
+            - sts:AssumeRole
+            Effect: Allow
+            Principal:
+              Service:
+              - dax.amazonaws.com
+        Version: '2012-10-17'
+      RoleName: DAX-Role
+      Policies:
+        -
+         PolicyName: DAXAccess
+         PolicyDocument:
+           Version: '2012-10-17'
+           Statement:
+             - Effect: Allow
+               Resource: '*'
+               Action:
+                - dax:PutItem
+                - dax:GetItem
+                - dax:Query
+                - dax:UpdateItem
+                - dax:ConditionCheckItem
+                - dynamodb:DescribeTable
+                - dynamodb:GetItem
+                - dynamodb:PutItem
+                - dynamodb:Query
+                - dynamodb:UpdateItem
+      ManagedPolicyArns:
+         - arn:aws:iam::aws:policy/service-role/AWSLambdaVPCAccessExecutionRole
+
+##########################################################################
+#  DAX                                                                   #
+##########################################################################
+  DaxCluster:
+    Type: AWS::DAX::Cluster
+    Properties:
+      IAMRoleARN: !GetAtt DAXRole.Arn
+      NodeType: dax.t2.small
+      ReplicationFactor: 3
+      SecurityGroupIds:
+        - !GetAtt DAXSecurityGroup.GroupId
+      SubnetGroupName: !Ref DAXSubnetGroup
+
+Outputs:
+  DAXClusterDiscoveryEndpoint:
+    Description: "DAX Cluster Discovery Endpoint"
+    Value: !GetAtt DaxCluster.ClusterDiscoveryEndpoint
+    Export:
+      Name: DAXClusterDiscoveryEndpoint
+  DAXClusterArn:
+    Description: "DAX Cluster Arn"
+    Value: !GetAtt DaxCluster.Arn
+    Export:
+      Name: DAXClusterArn
+  DAXSecurityGroup:
+    Description: "DAX Security Group"
+    Value: !GetAtt DAXSecurityGroup.GroupId
+    Export:
+      Name: DAXSecurityGroup
+  DAXRoleArn:
+    Description: "DAX Role Arn"
+    Value: !GetAtt DAXRole.Arn
+    Export:
+      Name: DAXRoleArn
