@@ -71,10 +71,13 @@
             }
           },
           "400": {
-            "description": "Failed to parse from request body"
+            "description": "Invalid request body"
           },
           "406": {
             "description": "Limit reached, move to PRO plan"
+          },
+          "422": {
+            "description": "Failed to parse JSON from request body"
           },
           "500": {
             "description": "Internal error"

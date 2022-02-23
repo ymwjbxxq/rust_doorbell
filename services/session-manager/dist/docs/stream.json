@@ -71,13 +71,16 @@
             "description": "Stream added"
           },
           "400": {
-            "description": "Failed to parse from request body"
+            "description": "Invalid request body"
           },
           "404": {
             "description": "No subscription found"
           },
           "406": {
             "description": "Too many active streams, move to PRO plan"
+          },
+          "422": {
+            "description": "Failed to parse JSON from request body"
           },
           "500": {
             "description": "Internal error"

@@ -78,10 +78,13 @@
             "description": "Subscription added"
           },
           "400": {
-            "description": "Failed to parse from request body"
+            "description": "Invalid request body"
           },
           "406": {
             "description": "Subscription already existing"
+          },
+          "422": {
+            "description": "Failed to parse JSON from request body"
           },
           "500": {
             "description": "Internal error"

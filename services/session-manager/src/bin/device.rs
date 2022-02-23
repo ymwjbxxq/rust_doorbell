@@ -62,8 +62,8 @@ pub async fn execute(
         }
     } else {
         Ok(ApiHelper::response(
-            StatusCode::BAD_REQUEST,
-            json!({ "message": "Failed to parse device from request body" }).to_string(),
+            StatusCode::UNPROCESSABLE_ENTITY,
+            json!({ "message": "Failed to parse JSON from request body" }).to_string(),
         ))
     }
 }

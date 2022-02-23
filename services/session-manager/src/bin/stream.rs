@@ -89,7 +89,7 @@ pub async fn execute(
     }
 
     return Ok(ApiHelper::response(
-        StatusCode::BAD_REQUEST,
-        json!({ "message": "Failed to parse streams from request body" }).to_string(),
+        StatusCode::UNPROCESSABLE_ENTITY,
+        json!({ "message": "Failed to parse JSON from request body" }).to_string(),
     ));
 }
