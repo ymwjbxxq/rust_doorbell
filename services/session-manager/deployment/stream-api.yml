@@ -98,8 +98,23 @@ Resources:
                 - dynamodb:GetItem
               Resource:
                 - !ImportValue SubscriptionTableArn
+      #       - Effect: Allow
+      #         Action: 
+      #           - dax:PutItem
+      #           - dax:ConditionCheckItem
+      #           - dynamodb:PutItem
+      #         Resource: 
+      #           - !ImportValue DAXClusterArn
+      # VpcConfig:
+      #   SecurityGroupIds: 
+      #       - !ImportValue DAXSecurityGroup
+      #   SubnetIds:
+      #       - !Ref PrivateSubNet2
+      #       - !Ref PrivateSubNet2
+      #       - !Ref PrivateSubNet3
       Environment:
         Variables:
+          DAX_ENDPOINT: !ImportValue DAXClusterDiscoveryEndpoint
           STREAMING_TABLE_NAME: !ImportValue StreamingTableName
           SUBSCRIPTION_TABLE_NAME: !ImportValue SubscriptionTableName
       Tags:

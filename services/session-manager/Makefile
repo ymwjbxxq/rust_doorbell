@@ -21,13 +21,16 @@ build-%:
 	cp -v ../../target/$(ARCH)/release/$* ./build/$*/bootstrap
 
 deploy:
-	sam deploy --guided --no-fail-on-empty-changeset --no-confirm-changeset --profile test --stack-name ${STACK_NAME}-dynamodb 						--template-file ./deployment/dynamodb.yml
-	sam deploy --guided --no-fail-on-empty-changeset --no-confirm-changeset --profile test --stack-name ${STACK_NAME}-subscription-api 		--template-file ./deployment/subscription-api.yml
-	sam deploy --guided --no-fail-on-empty-changeset --no-confirm-changeset --profile test --stack-name ${STACK_NAME}-device-api 		--template-file ./deployment/device-api.yml
-	sam deploy --guided --no-fail-on-empty-changeset --no-confirm-changeset --profile test --stack-name ${STACK_NAME}-stream-api 		--template-file ./deployment/stream-api.yml
+	# aws cloudformation deploy --capabilities CAPABILITY_NAMED_IAM --no-fail-on-empty-changeset --force-upload --profile test --region eu-central-1 --stack-name ${STACK_NAME}-dax --template ./deployment/dax.yml
+	sam deploy --guided --no-fail-on-empty-changeset --no-confirm-changeset --profile test --stack-name ${STACK_NAME}-dynamodb --template-file ./deployment/dynamodb.yml
+	sam deploy --guided --no-fail-on-empty-changeset --no-confirm-changeset --profile test --stack-name ${STACK_NAME}-subscription-api --template-file ./deployment/subscription-api.yml
+	sam deploy --guided --no-fail-on-empty-changeset --no-confirm-changeset --profile test --stack-name ${STACK_NAME}-device-api --template-file ./deployment/device-api.yml
+	sam deploy --guided --no-fail-on-empty-changeset --no-confirm-changeset --profile test --stack-name ${STACK_NAME}-stream-api --template-file ./deployment/stream-api.yml
 
 delete:
 	sam delete --profile test --stack-name ${STACK_NAME}-subscription-api
 	sam delete --profile test --stack-name ${STACK_NAME}-stream-api
 	sam delete --profile test --stack-name ${STACK_NAME}-device-api
 	sam delete --profile test --stack-name ${STACK_NAME}-dynamodb
+	sam delete --profile test --stack-name ${STACK_NAME}-dax
+	# aws cloudformation delete-stack --stack-name ${STACK_NAME}-dax --profile test --region eu-central-1

@@ -1,11 +1,11 @@
 use aws_config::{RetryConfig, TimeoutConfig};
+use aws_sdk_dax::Endpoint;
 use lambda_http::{http::StatusCode, service_fn, Error, IntoResponse, Request, RequestExt};
 use serde_json::json;
 use session_manager::{
     commands::update_subscription_device::{
         UpdateSubscriptionDevice, UpdateSubscriptionDeviceCommanad,
     },
-    models::device_request::DeviceRequest,
     utils::{api_helper::ApiHelper, dynamodb::AttributeValuesExt},
 };
 use std::time::Duration;
@@ -22,7 +22,16 @@ async fn main() -> Result<(), Error> {
         )
         .load()
         .await;
-    let dynamodb_client = aws_sdk_dynamodb::Client::new(&config);
+    
+    let dax_endpoint = std::env::var("DAX_ENDPOINT").expect("DAX_ENDPOINT must be set");
+    let dynamodb_dax_config = aws_sdk_dynamodb::config::Builder::from(&config)
+        .endpoint_resolver(
+            // 8000 is the default dynamodb port
+            Endpoint::immutable(dax_endpoint.parse().unwrap()),
+        )
+        .build();
+
+    let dynamodb_client = aws_sdk_dynamodb::Client::from_conf(dynamodb_dax_config);
 
     lambda_http::run(service_fn(|event: Request| {
         execute(&dynamodb_client, event)
@@ -31,11 +40,8 @@ async fn main() -> Result<(), Error> {
     Ok(())
 }
 
-pub async fn execute(
-    client: &aws_sdk_dynamodb::Client,
-    event: Request,
-) -> Result<impl IntoResponse, Error> {
-    let body = event.payload::<DeviceRequest>()?;
+pub async fn execute(client: &aws_sdk_dynamodb::Client, event: Request) -> Result<impl IntoResponse, Error> {
+    let body = event.payload()?;
 
     if let Some(device_request) = body {
         let result = UpdateSubscriptionDevice::new()

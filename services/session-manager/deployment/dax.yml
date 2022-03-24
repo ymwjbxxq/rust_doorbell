@@ -8,15 +8,19 @@ Parameters:
   VpcId:
     Description: VPC where the APIGW will be created
     Type: String
+    Default: vpc-0c0618544a53773d3
   PrivateSubNet1:
     Description: private subnet of the vpc
     Type: String
+    Default: subnet-00ac1616733ccff30
   PrivateSubNet2:
     Description: private subnet of the vpc
     Type: String
+    Default: subnet-04a0831fd8c24b76c 
   PrivateSubNet3:
     Description: private subnet of the vpc
     Type: String
+    Default: subnet-06638231c540f8e01
 
 Resources:
 ##########################################################################
@@ -64,6 +68,7 @@ Resources:
             Principal:
               Service:
               - dax.amazonaws.com
+              - lambda.amazonaws.com
         Version: '2012-10-17'
       RoleName: DAX-Role
       Policies:
@@ -104,7 +109,7 @@ Resources:
 Outputs:
   DAXClusterDiscoveryEndpoint:
     Description: "DAX Cluster Discovery Endpoint"
-    Value: !GetAtt DaxCluster.ClusterDiscoveryEndpoint
+    Value: !Join [ '', [ dax://, !GetAtt DaxCluster.ClusterDiscoveryEndpoint] ]
     Export:
       Name: DAXClusterDiscoveryEndpoint
   DAXClusterArn:
